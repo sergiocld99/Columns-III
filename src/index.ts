@@ -27,9 +27,31 @@ let imgJewels: HTMLImageElement[] = Array(6)
 for (let i=0; i<imgJewels.length; i++) 
     imgJewels[i] = document.getElementById(`st5-${i+1}`) as HTMLImageElement
 
+// player board
+const leftBoardEl = document.getElementById("left_board") as HTMLCanvasElement
+const leftBoardCtx = leftBoardEl.getContext("2d")!
+
+let fallingBlock = new Block(2)
+
 function drawNextBlock() {
     let block = new Block()
     block.draw(imgJewels, leftNextCtx, leftNextEl.width, leftNextEl.height)
 }
 
+document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") fallingBlock.moveLeft()
+    else if (e.key === "ArrowRight") fallingBlock.moveRight(6)
+    else if (e.key === " ") fallingBlock.rotate()
+    else console.log(e.key)
+})
+
 setInterval(drawNextBlock, 1000)
+
+setInterval(() => {
+    fallingBlock.row += 0.5
+    if (fallingBlock.row > 10) fallingBlock = new Block(2)
+}, 500)
+
+setInterval(() => {
+    fallingBlock.draw(imgJewels, leftBoardCtx, leftBoardEl.width, leftBoardEl.height)
+}, 20)

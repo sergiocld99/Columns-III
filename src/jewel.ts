@@ -9,9 +9,9 @@ export class Jewel {
     }
 
     draw(imgs: HTMLImageElement[], ctx: CanvasRenderingContext2D, row: number, col: number){
-        let mx = 30, my = 4
-        let dx = col*300+mx, dy = row*50+my
-        let dw = 300-mx*2, dh = 50-my*2
+        let mx = 5, my = 4
+        let dx = col*50+mx, dy = row*50+my
+        let dw = 50-mx*2, dh = 50-my*2
         ctx.drawImage(imgs[this.color],dx,dy,dw,dh)
     }
 }
