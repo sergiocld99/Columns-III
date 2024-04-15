@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Columns III</title>
+    <style>
+        * {
+            margin: 0;
+        }
+
+        body {
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .board {
+            border: 3px solid white;
+            margin-bottom: 15px;
+        }
+
+        .player-board {
+            width: calc(6*45px);
+            height: calc(13*45px);
+            margin: 0 20px;
+        }
+
+        .player-stats {
+            height: calc(13*45px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .next-board {
+            width: 50px;
+            height: calc(3*50px);
+        }
+
+        .blue-score {
+            width: 50px;
+            height: 50px;
+        }
+
+        .white-score {
+            width: calc(1.75*50px);
+            height: calc(0.5*50px);
+        }
+    </style>
+</head>
+<body>
+    <div class="player-stats" id="left_stats">
+        <canvas class="board next-board"></canvas>
+        <canvas class="board blue-score"></canvas>
+        <canvas class="board white-score"></canvas>
+    </div>
+    <canvas class="board player-board" id="left_board"></canvas>
+    <canvas class="board player-board" id="right_board"></canvas>
+    <div class="player-stats" id="right_stats">
+        <canvas class="board next-board"></canvas>
+        <canvas class="board blue-score"></canvas>
+        <canvas class="board white-score"></canvas>
+    </div>
+    <script src="index.js" type="module"></script>
+</body>
+</html>
