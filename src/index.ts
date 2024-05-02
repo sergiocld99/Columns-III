@@ -32,10 +32,10 @@ const leftBoardEl = document.getElementById("left_board") as HTMLCanvasElement
 const leftBoardCtx = leftBoardEl.getContext("2d")!
 
 let fallingBlock = new Block(2)
+let nextBlock = new Block()
 
 function drawNextBlock() {
-    let block = new Block()
-    block.draw(imgJewels, leftNextCtx, leftNextEl.width, leftNextEl.height)
+    nextBlock.draw(imgJewels, leftNextCtx, leftNextEl.width, leftNextEl.height)
 }
 
 document.addEventListener("keydown", e => {
@@ -45,13 +45,21 @@ document.addEventListener("keydown", e => {
     else console.log(e.key)
 })
 
-setInterval(drawNextBlock, 1000)
+// SETUP
+drawNextBlock()
+
+// LOOPS
 
 setInterval(() => {
     fallingBlock.row += 0.5
-    if (fallingBlock.row > 10) fallingBlock = new Block(2)
+    if (fallingBlock.row > 10) {
+        fallingBlock = new Block(2, nextBlock)
+        nextBlock = new Block()
+        drawNextBlock()
+    }
 }, 500)
 
 setInterval(() => {
     fallingBlock.draw(imgJewels, leftBoardCtx, leftBoardEl.width, leftBoardEl.height)
 }, 20)
+

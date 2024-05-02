@@ -8,8 +8,13 @@ export default class Block {
     row = 0
     col: number
 
-    constructor(col = 0){
-        for (let i=0; i<3; i++) this.jewels.push(new Jewel(randInt(COLOR_VARIANTS_COUNT)))
+    constructor(col = 0, nextBlock: Block | null = null){
+        if (nextBlock){
+            nextBlock.jewels.forEach(j => this.jewels.push(j))
+        } else {
+            for (let i=0; i<3; i++) this.jewels.push(new Jewel(randInt(COLOR_VARIANTS_COUNT)))
+        }
+
         this.col = col
     }
 
