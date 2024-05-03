@@ -68,8 +68,9 @@ export default class Board {
         let lastJewel: Cell = row[0]
         let jewelsInRow = lastJewel ? 1 : 0
         let currentJewel
+        let c: number
 
-        for (let c=1; c<row.length; c++){
+        for (c=1; c<row.length; c++){
             currentJewel = row[c]
             
             if (!currentJewel){
@@ -90,6 +91,11 @@ export default class Board {
                 jewelsInRow = 1
                 lastJewel = currentJewel
             }
+        }
+
+        // final checking
+        if (jewelsInRow >= 3){
+            this.clearRow(r, c-jewelsInRow, jewelsInRow)
         }
     }
 
