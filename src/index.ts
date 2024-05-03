@@ -40,8 +40,8 @@ function drawNextBlock() {
 }
 
 document.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft") fallingBlock.moveLeft()
-    else if (e.key === "ArrowRight") fallingBlock.moveRight(6)
+    if (e.key === "ArrowLeft") fallingBlock.moveLeft(board)
+    else if (e.key === "ArrowRight") fallingBlock.moveRight(board)
     else if (e.key === " ") fallingBlock.rotate()
     else console.log(e.key)
 })

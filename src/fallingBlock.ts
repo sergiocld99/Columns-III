@@ -1,4 +1,5 @@
 import Block from "./block.js";
+import Board from "./board.js";
 
 export default class FallingBlock extends Block {
 
@@ -7,15 +8,29 @@ export default class FallingBlock extends Block {
         nextBlock.jewels.forEach(j => this.jewels.push(j))
     }
 
+    getBottomRow() : number {
+        return Math.floor(this.row + this.jewels.length - 1)
+    }
+
     rotate(){
         this.jewels = [this.jewels[2], this.jewels[0], this.jewels[1]]    
     }
 
-    moveLeft(){
-        if (this.col > 0) this.col--
+    moveLeft(board: Board){
+        if (this.col > 0) {
+            if (board.matrix[this.getBottomRow()][this.col-1] === null){
+                this.col--
+            }
+        }
     }
 
-    moveRight(boardCols: number){
-        if (this.col < boardCols-1) this.col++
+    moveRight(board: Board){
+        const boardCols = board.matrix[0].length
+
+        if (this.col < boardCols){
+            if (board.matrix[this.getBottomRow()][this.col+1] === null){
+                this.col++
+            }
+        } 
     }
 }
