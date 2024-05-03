@@ -18,9 +18,7 @@ export default class Block {
         this.col = col
     }
 
-    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D, w: number, h: number){
-        ctx.clearRect(0,0,w,h)
-
+    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D){
         this.jewels.forEach((jw, i) => {
             jw.draw(imgJewels, ctx, this.row+i, this.col)
         })

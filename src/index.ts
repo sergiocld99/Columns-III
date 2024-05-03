@@ -1,4 +1,5 @@
 import Block from "./block.js";
+import Board from "./board.js";
 
 function playMusic(name: string, initialSecs = 0) {
     const bgm = new Audio(`bgm/${name}.bgm`);
@@ -31,11 +32,9 @@ for (let i=0; i<imgJewels.length; i++)
 const leftBoardEl = document.getElementById("left_board") as HTMLCanvasElement
 const leftBoardCtx = leftBoardEl.getContext("2d")!
 
-let fallingBlock = new Block(2)
-let nextBlock = new Block()
-
 function drawNextBlock() {
-    nextBlock.draw(imgJewels, leftNextCtx, leftNextEl.width, leftNextEl.height)
+    leftNextCtx.clearRect(0,0, leftNextEl.width, leftNextEl.height)
+    nextBlock.draw(imgJewels, leftNextCtx)
 }
 
 document.addEventListener("keydown", e => {
@@ -46,13 +45,16 @@ document.addEventListener("keydown", e => {
 })
 
 // SETUP
+let fallingBlock = new Block(2)
+let nextBlock = new Block()
+let board = new Board(13,6)
 drawNextBlock()
 
 // LOOPS
-
 setInterval(() => {
     fallingBlock.row += 0.5
     if (fallingBlock.row > 10) {
+        board.placeBlock(fallingBlock)
         fallingBlock = new Block(2, nextBlock)
         nextBlock = new Block()
         drawNextBlock()
@@ -60,6 +62,10 @@ setInterval(() => {
 }, 500)
 
 setInterval(() => {
-    fallingBlock.draw(imgJewels, leftBoardCtx, leftBoardEl.width, leftBoardEl.height)
+    leftBoardCtx.clearRect(0,0, leftBoardEl.width, leftBoardEl.height)
+
+    // draw
+    board.draw(imgJewels, leftBoardCtx)
+    fallingBlock.draw(imgJewels, leftBoardCtx)
 }, 20)
 
