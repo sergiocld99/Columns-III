@@ -57,13 +57,20 @@ drawNextBlock()
 // LOOPS
 setInterval(() => {
     fallingBlock.row += 0.5
+
     if (fallingBlock.row > board.getLastEmptyRow(fallingBlock.col) - 2) {
+        fallingBlock.row -= 0.5
+        
         board.placeBlock(fallingBlock)
+        board.checkColumn(fallingBlock.col)
+        board.checkRow(fallingBlock.row)
+        board.checkRow(fallingBlock.row+1)
+        board.checkRow(fallingBlock.row+2)
         fallingBlock = new FallingBlock(nextBlock)
         nextBlock = new NextBlock()
         drawNextBlock()
     }
-}, 500)
+}, 200)
 
 setInterval(() => {
     leftBoardCtx.clearRect(0,0, leftBoardEl.width, leftBoardEl.height)

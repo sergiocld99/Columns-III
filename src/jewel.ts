@@ -8,6 +8,10 @@ export class Jewel {
         this.color = color
     }
 
+    equals(other: Jewel) : boolean {
+        return other && other.color === this.color
+    }
+
     draw(imgs: HTMLImageElement[], ctx: CanvasRenderingContext2D, row: number, col: number){
         let mx = 5, my = 4
         let dx = col*50+mx, dy = row*50+my
