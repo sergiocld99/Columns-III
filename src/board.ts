@@ -11,10 +11,18 @@ export default class Board {
         }
     }
 
+    getLastEmptyRow(col: number): number {
+        let row = this.matrix.length - 1
+
+        while (row >= 0 && this.matrix[row][col]) row--
+        return row
+    }
+
     placeBlock(block: Block){
         let r = Math.floor(block.row)
         
         for (let i=0; i<3; i++){
+            if (r+i < 0) continue
             this.matrix[r+i][block.col] = block.jewels[i]
         }
     }

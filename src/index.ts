@@ -1,5 +1,7 @@
 import Block from "./block.js";
 import Board from "./board.js";
+import FallingBlock from "./fallingBlock.js";
+import NextBlock from "./nextBlock.js";
 
 function playMusic(name: string, initialSecs = 0) {
     const bgm = new Audio(`bgm/${name}.bgm`);
@@ -45,18 +47,20 @@ document.addEventListener("keydown", e => {
 })
 
 // SETUP
-let fallingBlock = new Block(2)
-let nextBlock = new Block()
+let nextBlock = new NextBlock()
+let fallingBlock = new FallingBlock(nextBlock)
+
+nextBlock = new NextBlock()
 let board = new Board(13,6)
 drawNextBlock()
 
 // LOOPS
 setInterval(() => {
     fallingBlock.row += 0.5
-    if (fallingBlock.row > 10) {
+    if (fallingBlock.row > board.getLastEmptyRow(fallingBlock.col) - 2) {
         board.placeBlock(fallingBlock)
-        fallingBlock = new Block(2, nextBlock)
-        nextBlock = new Block()
+        fallingBlock = new FallingBlock(nextBlock)
+        nextBlock = new NextBlock()
         drawNextBlock()
     }
 }, 500)
