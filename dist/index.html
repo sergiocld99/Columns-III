@@ -15,6 +15,8 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
         }
 
         .board {
@@ -33,6 +35,24 @@
             align-items: center;
         }
 
+        .blue-score {
+            min-width: 50px;
+            min-height: 50px;
+            color: aqua;
+            font-size: 40px;
+            text-align: center;
+            
+        }
+
+        .white-score {
+            min-width: 80px;
+            min-height: 30px;
+            color: white;
+            font-size: 25px;
+            padding-right: 10px;
+            text-align: right;
+        }
+
         img {
             display: none;
         }
@@ -43,14 +63,14 @@
     <canvas class="board player-board" id="left_board" width="300px" height="650px"></canvas>
     <div class="player-stats" id="left_stats">
         <canvas class="board next-board" width="50px" height="150px"></canvas>
-        <canvas class="board blue-score" width="50px" height="50px"></canvas>
-        <canvas class="board white-score" width="90px" height="30px"></canvas>
+        <p class="board blue-score">0</p>
+        <p class="board white-score">0</p>
     </div>
     <span style="min-width: 40px;"></span>
     <div class="player-stats" id="right_stats">
         <canvas class="board next-board" width="50px" height="150px"></canvas>
-        <canvas class="board blue-score" width="50px" height="50px"></canvas>
-        <canvas class="board white-score" width="90px" height="30px"></canvas>
+        <p class="board blue-score">0</p>
+        <p class="board white-score">0</p>
     </div>
     <canvas class="board player-board" id="right_board" width="300px" height="650px"></canvas>
 

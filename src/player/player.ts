@@ -14,16 +14,20 @@ export default class Player {
     statsEl: HTMLDivElement
     boardEl: HTMLCanvasElement
     nextEl: HTMLCanvasElement
+    blueEl: HTMLParagraphElement
+    whiteEl: HTMLParagraphElement
 
     // context
     boardCtx: CanvasRenderingContext2D
     nextCtx: CanvasRenderingContext2D
 
     // match status
-    ready = true
+    blueScore = 0
+    clearCount = 0
     status = MatchStatus.FALLING_BLOCK
     timesInState = 0
     ticks = 0
+    multiplier = 3
 
     constructor(document: Document, preffix: string, colors: number[]){
         this.colors = colors
@@ -33,6 +37,8 @@ export default class Player {
 
         // HTML references
         this.statsEl = document.getElementById(`${preffix}_stats`) as HTMLDivElement
+        this.blueEl = this.statsEl.getElementsByClassName("blue-score")[0] as HTMLParagraphElement
+        this.whiteEl = this.statsEl.getElementsByClassName("white-score")[0] as HTMLParagraphElement
         this.nextEl = this.statsEl.getElementsByClassName("next-board")[0] as HTMLCanvasElement
         this.nextCtx = this.nextEl.getContext("2d")!
 
@@ -67,8 +73,9 @@ export default class Player {
             if (success) {
                 this.status = MatchStatus.CLEARING
                 this.timesInState = 0
+                this.multiplier = 3
             } else {
-                this.board.reset()
+                this.reset()
             }
 
             this.fallingBlock = new FallingBlock(this.nextBlock)
@@ -79,11 +86,7 @@ export default class Player {
     private stepClearing(){
         if (this.timesInState === 0){
             let recheck = this.board.checkEverything()
-            if (!recheck) {
-                this.status = MatchStatus.FALLING_BLOCK
-                
-                
-            }
+            if (!recheck) this.status = MatchStatus.FALLING_BLOCK
         } else if (this.timesInState >= 2){
             this.status = MatchStatus.APPLYING_GRAVITY
         }
@@ -92,9 +95,16 @@ export default class Player {
     }
 
     private stepGravity(){
+        let clears = Math.ceil(this.board.toClear.length / 3)
+        this.blueScore += (clears * this.multiplier)
+        this.clearCount += clears
         this.board.clearPending()
         this.status = MatchStatus.CLEARING
         this.timesInState = 0
+        this.multiplier += 4
+
+        this.blueEl.innerHTML = this.blueScore.toString()
+        this.whiteEl.innerHTML = this.clearCount.toString()
     }
 
     drawNextBlock(imgJewels: HTMLImageElement[]) {
@@ -108,5 +118,16 @@ export default class Player {
         this.boardCtx.clearRect(0,0, this.boardEl.width, this.boardEl.height)
         this.board.draw(imgJewels, this.boardCtx, this.ticks)
         this.fallingBlock.draw(imgJewels, this.boardCtx)
+    }
+
+    reset(){
+        this.board.reset()
+        this.blueScore = 0
+        this.clearCount = 0
+        this.blueEl.innerHTML = this.blueScore.toString()
+        this.whiteEl.innerHTML = this.clearCount.toString()
+        this.status = MatchStatus.FALLING_BLOCK
+        this.timesInState = 0
+        this.ticks = 0
     }
 }
