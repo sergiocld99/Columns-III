@@ -1,5 +1,6 @@
 import Block from "./block.js";
 import Board from "./board.js";
+import CpuPlayer from "./cpuPlayer.js";
 import FallingBlock from "./fallingBlock.js";
 import NextBlock from "./nextBlock.js";
 import Player from "./player.js";
@@ -32,7 +33,7 @@ let player1 = new Player(document, "left")
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
-let player2 = new Player(document, "right", 4)
+let player2 = new CpuPlayer(document, "right", 3)
 player2.drawNextBlock(imgJewels)
 
 // LOOPS FOR PLAYER 1

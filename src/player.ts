@@ -52,10 +52,19 @@ export default class Player {
             if (!success) {
                 this.board.reset()
             } else {
-                this.board.checkColumn(this.fallingBlock.col)
-                this.board.checkRow(this.fallingBlock.row)
-                this.board.checkRow(this.fallingBlock.row+1)
-                this.board.checkRow(this.fallingBlock.row+2)
+                this.board.check(
+                    [this.fallingBlock.col],
+                    [
+                        this.fallingBlock.row,
+                        this.fallingBlock.row+1,
+                        this.fallingBlock.row+2
+                    ]
+                )
+                
+                //this.board.checkColumn(this.fallingBlock.col)
+                //this.board.checkRow(this.fallingBlock.row)
+                //this.board.checkRow(this.fallingBlock.row+1)
+                //this.board.checkRow(this.fallingBlock.row+2)
             }
 
             this.fallingBlock = new FallingBlock(this.nextBlock)

@@ -2,9 +2,11 @@ import Block from "./block.js";
 import { Jewel } from "./jewel.js";
 
 type Cell = Jewel | null
+type Position = [number, number]
 
 export default class Board {
     matrix: Cell[][]
+    toClear: Position[] = []
 
     constructor(rows: number, cols: number){
         this.matrix = Array(rows)
@@ -33,7 +35,16 @@ export default class Board {
 
     // ---- AFTER BLOCK PLACED ----------------------------
 
-    checkColumn(col: number){
+    check(cols: number[], rows: number[]){
+        cols.forEach(c => this.checkColumn(c))
+        rows.forEach(r => this.checkRow(r))
+        
+        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
+        this.toClear = []
+        this.applyGravityEverywhere()
+    }
+
+    checkColumn(col: number) {
         let lastJewel = this.matrix[this.matrix.length-1][col]
         if (!lastJewel) return
 
@@ -104,18 +115,20 @@ export default class Board {
     clearColumn(col: number, topRow: number, count: number){
         // clear jewels
         for (let i=0; i<count; i++){
-            this.matrix[topRow+i][col] = null
+            //this.matrix[topRow+i][col] = null
+            this.toClear.push([topRow+i, col])
         }
 
         // apply gravity
-        this.applyGravity(col, topRow-1, count)
+        //this.applyGravity(col, topRow-1, count)
     }
 
     clearRow(row: number, firstCol: number, count: number){
         // clear jewels
         for (let c=firstCol; c<firstCol+count; c++){
-            this.matrix[row][c] = null
-            this.applyGravity(c, row-1, 1)
+            //this.matrix[row][c] = null
+            //this.applyGravity(c, row-1, 1)
+            this.toClear.push([row, c])
         }
     }
 
@@ -129,8 +142,24 @@ export default class Board {
         }
     }
 
-    isColumnFull(col: number){
-        return this.matrix[0][col] != null
+    applyGravityEverywhere(){
+        const cols = this.matrix[0].length
+        const bottomRow = this.matrix.length - 1
+
+        for (let c=0; c<cols; c++){
+            let spaces = 0
+            let temp: Cell
+            
+            for (let r=bottomRow; r>=0; r--){
+                if (this.matrix[r][c] === null) spaces++
+                else if (spaces > 0){
+                    // apply gravity to jewel
+                    temp = this.matrix[r][c]
+                    this.matrix[r+spaces][c] = temp
+                    this.matrix[r][c] = null
+                }
+            }
+        }
     }
 
     // ----------------------------------------------------
