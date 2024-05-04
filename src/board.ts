@@ -50,10 +50,12 @@ export default class Board {
         for (let c=0; c<this.colCount; c++){
             this.checkColumn(c)
             this.checkDescendingDiagonal(0,c)
+            this.checkAscendingDiagonal(this.rowCount-1,c)
         }
 
         for (let r=0; r<this.rowCount; r++) this.checkRow(r)
         for (let r=1; r<this.rowCount; r++) this.checkDescendingDiagonal(r,0)
+        for (let r=this.rowCount-2; r>=0; r--) this.checkAscendingDiagonal(r,0)
 
         this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]]!.clearing = true)
         return this.toClear.length > 0
@@ -155,6 +157,37 @@ export default class Board {
         }
     }
 
+    checkAscendingDiagonal(r: number, c: number){
+        let lastJewel = this.matrix[r][c]
+        let jewelsInRow = lastJewel ? 1 : 0
+        let currentJewel: Cell
+        r--
+        c++
+
+        while (r >= 0 && c < this.colCount){
+            currentJewel = this.matrix[r][c]
+
+            if (currentJewel === null){
+                if (jewelsInRow >= 3) this.clearAscendingDiagonal(r+jewelsInRow, c-jewelsInRow, jewelsInRow)
+                jewelsInRow = 0
+            } else if (lastJewel === null || currentJewel.equals(lastJewel)){
+                jewelsInRow++
+            } else {
+                if (jewelsInRow >= 3) this.clearAscendingDiagonal(r+jewelsInRow, c-jewelsInRow, jewelsInRow)
+                jewelsInRow = 1
+            }
+
+            lastJewel = currentJewel
+            r--
+            c++
+        }
+
+        // final checking
+        if (jewelsInRow >= 3){
+            this.clearAscendingDiagonal(r+jewelsInRow, c-jewelsInRow, jewelsInRow)
+        }
+    }
+
     clearColumn(col: number, topRow: number, count: number){
         for (let i=0; i<count; i++){
             this.toClear.push([topRow+i, col])
@@ -170,6 +203,12 @@ export default class Board {
     clearDescendingDiagonal(rowStart: number, colStart: number, count: number){
         for (let i=0; i<count; i++){
             this.toClear.push([rowStart+i, colStart+i])
+        }
+    }
+
+    clearAscendingDiagonal(rowStart: number, colStart: number, count: number){
+        for (let i=0; i<count; i++){
+            this.toClear.push([rowStart-i, colStart+i])
         }
     }
 
