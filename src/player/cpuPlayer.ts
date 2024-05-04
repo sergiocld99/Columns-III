@@ -4,8 +4,8 @@ import Player from "./player.js";
 export default class CpuPlayer extends Player {
     auxTicks = 0
 
-    constructor(document: Document, preffix: string, maxColors = COLOR_VARIANTS_COUNT){
-        super(document, preffix, maxColors)
+    constructor(document: Document, preffix: string, colors: number[]){
+        super(document, preffix, colors)
     }
 
     loop(){

@@ -25,11 +25,11 @@ for (let i=0; i<imgJewels.length; i++)
 
 
 // SETUP FOR PLAYER 1
-let player1 = new ManualPlayer(document, "left")
+let player1 = new CpuPlayer(document, "left", [0, 2, 4])
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
-let player2 = new CpuPlayer(document, "right", 3)
+let player2 = new CpuPlayer(document, "right", [1, 3, 5])
 player2.drawNextBlock(imgJewels)
 
 // LOOPS

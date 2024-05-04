@@ -3,8 +3,8 @@ import Player from "./player.js";
 
 export default class ManualPlayer extends Player {
 
-    constructor(document: Document, preffix: string, maxColors = COLOR_VARIANTS_COUNT){
-        super(document, preffix, maxColors)
+    constructor(document: Document, preffix: string, colors: number[]){
+        super(document, preffix, colors)
 
         // KEY LISTENER
         document.addEventListener("keydown", e => {

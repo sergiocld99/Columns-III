@@ -8,7 +8,7 @@ export default class Player {
     nextBlock: NextBlock
     fallingBlock: FallingBlock
     board: Board
-    maxColors: number
+    colors: number[]
 
     // HTML elements
     statsEl: HTMLDivElement
@@ -25,10 +25,10 @@ export default class Player {
     timesInState = 0
     ticks = 0
 
-    constructor(document: Document, preffix: string, maxColors = COLOR_VARIANTS_COUNT){
-        this.maxColors = maxColors
-        this.fallingBlock = new FallingBlock(new NextBlock(maxColors))
-        this.nextBlock = new NextBlock(maxColors)
+    constructor(document: Document, preffix: string, colors: number[]){
+        this.colors = colors
+        this.fallingBlock = new FallingBlock(new NextBlock(colors))
+        this.nextBlock = new NextBlock(colors)
         this.board = new Board(13,6)
 
         // HTML references
@@ -72,7 +72,7 @@ export default class Player {
             }
 
             this.fallingBlock = new FallingBlock(this.nextBlock)
-            this.nextBlock = new NextBlock(this.maxColors)
+            this.nextBlock = new NextBlock(this.colors)
         }
     }
 

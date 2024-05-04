@@ -4,8 +4,8 @@ import { randInt } from "./utils.js";
 
 export default class NextBlock extends Block {
 
-    constructor(maxColors: number){
+    constructor(colors: number[]){
         super(0,0)
-        for (let i=0; i<3; i++) this.jewels.push(new Jewel(randInt(maxColors)))
+        for (let i=0; i<3; i++) this.jewels.push(new Jewel(colors[randInt(colors.length)]))
     }
 }
