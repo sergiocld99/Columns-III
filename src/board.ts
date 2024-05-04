@@ -47,9 +47,13 @@ export default class Board {
     }
 
     checkEverything() : boolean {        
-        for (let c=0; c<this.colCount; c++) this.checkColumn(c)
+        for (let c=0; c<this.colCount; c++){
+            this.checkColumn(c)
+            this.checkDescendingDiagonal(0,c)
+        }
+
         for (let r=0; r<this.rowCount; r++) this.checkRow(r)
-        //this.checkDescendingDiagonals()
+        for (let r=1; r<this.rowCount; r++) this.checkDescendingDiagonal(r,0)
 
         this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]]!.clearing = true)
         return this.toClear.length > 0
@@ -120,33 +124,34 @@ export default class Board {
         }
     }
 
-    checkDescendingDiagonals(){
-        for (let c=0; c<this.colCount-2; c++){
-            let lastJewel = this.matrix[0][c]
-            let jewelsInRow = lastJewel ? 1 : 0
-            let currentJewel: Cell
-            let r: number
+    checkDescendingDiagonal(r: number, c: number){
+        let lastJewel = this.matrix[r][c]
+        let jewelsInRow = lastJewel ? 1 : 0
+        let currentJewel: Cell
+        r++
+        c++
 
-            for (r=1; r<this.rowCount; r++){
-                currentJewel = this.matrix[r][c]
+        while (r < this.rowCount && c < this.colCount){
+            currentJewel = this.matrix[r][c]
 
-                if (currentJewel === null){
-                    if (jewelsInRow >= 3) this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
-                    jewelsInRow = 0
-                } else if (lastJewel === null || currentJewel.equals(lastJewel)){
-                    jewelsInRow++
-                } else {
-                    if (jewelsInRow >= 3) this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
-                    jewelsInRow = 1
-                }
-
-                lastJewel = currentJewel
+            if (currentJewel === null){
+                if (jewelsInRow >= 3) this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
+                jewelsInRow = 0
+            } else if (lastJewel === null || currentJewel.equals(lastJewel)){
+                jewelsInRow++
+            } else {
+                if (jewelsInRow >= 3) this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
+                jewelsInRow = 1
             }
 
-            // final checking
-            if (jewelsInRow >= 3){
-                this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
-            }
+            lastJewel = currentJewel
+            r++
+            c++
+        }
+
+        // final checking
+        if (jewelsInRow >= 3){
+            this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
         }
     }
 
@@ -205,5 +210,21 @@ export default class Board {
                 row[c] = null
             }
         })
+
+        this.toClear = []
+    }
+
+    // ---- CPU STRATEGIES ----------------
+
+    getTopCell(col: number) : Cell {
+        let res = null
+        let r = 0
+
+        while (res === null && r < this.rowCount){
+            res = this.matrix[r][col]
+            r++
+        }
+
+        return res
     }
 }

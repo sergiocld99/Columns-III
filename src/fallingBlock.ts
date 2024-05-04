@@ -1,5 +1,6 @@
 import Block from "./block.js";
 import Board from "./board.js";
+import { Jewel } from "./jewel.js";
 
 export default class FallingBlock extends Block {
 
@@ -32,5 +33,11 @@ export default class FallingBlock extends Block {
                 this.col++
             }
         } 
+    }
+
+    // ---- CPU STRATEGIES ----------
+
+    getBottomJewel() : Jewel {
+        return this.jewels[2]
     }
 }

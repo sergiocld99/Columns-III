@@ -80,6 +80,7 @@ export default class Player {
             }
 
             this.fallingBlock = new FallingBlock(this.nextBlock)
+            this.nextBlock = new NextBlock(this.maxColors)
         }
     }
 
@@ -89,7 +90,7 @@ export default class Player {
             if (!recheck) {
                 this.status = MatchStatus.FALLING_BLOCK
                 
-                this.nextBlock = new NextBlock(this.maxColors)
+                
             }
         } else if (this.timesInState >= 2){
             this.status = MatchStatus.APPLYING_GRAVITY

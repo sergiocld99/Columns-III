@@ -9,14 +9,21 @@ export default class CpuPlayer extends Player {
     }
 
     loop(){
-        if (++this.auxTicks >= 10 && this.fallingBlock.row > 0){
+        this.auxTicks++
+
+        if (this.auxTicks >= 7 && this.fallingBlock.row > 0){
             this.auxTicks = 0
 
-            if (Math.random() < 0.5 && this.fallingBlock.col != 3){
+            if (Math.random() < 0.5 && this.fallingBlock.col < 3){
                 this.fallingBlock.moveLeft(this.board)
-            } else if (this.fallingBlock.col != 1) {
+            } else if (this.fallingBlock.col > 1) {
                 this.fallingBlock.moveRight(this.board)
-            } else {
+            }
+        }
+
+        if (this.auxTicks % 5 === 0){
+            let topCell = this.board.getTopCell(this.fallingBlock.col)
+            if (topCell && !this.fallingBlock.getBottomJewel().equals(topCell)){
                 this.fallingBlock.rotate()
             }
         }
