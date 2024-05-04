@@ -91,12 +91,23 @@ export default class Player {
                 this.status = MatchStatus.FALLING_BLOCK
 
                 if (this.blueScore >= 30 && this.opponent){
-                    let randomIndex = Math.floor(Math.random() * this.board.colCount)
-                    let count = this.opponent.board.poisonColumn(randomIndex, this.board.matrix)
-                    this.updateBlueScore(-10 * count)
+                    let count = Math.floor(this.blueScore / 10)
+                    let targetIndex = (this.opponent.fallingBlock.col + 3) % this.board.colCount
+                    
+                    for (let i=0; i<count; i++) {
+                        let added = this.opponent.board.poisonColumn(targetIndex)
+                        if (added) this.updateBlueScore(-added * 10)
+                    }
+
+                    // random
+                    while(this.blueScore >= 10){
+                        let randomIndex = Math.floor(Math.random() * this.board.colCount)
+                        let added = this.opponent.board.poisonColumn(randomIndex)
+                        if (added) this.updateBlueScore(-added * 10)
+                    }
                 }
             }
-        } else if (this.timesInState >= 2){
+        } else if (this.timesInState >= 4){
             this.status = MatchStatus.APPLYING_GRAVITY
         }
 

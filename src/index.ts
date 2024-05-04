@@ -24,6 +24,7 @@ let imgJewels: HTMLImageElement[] = Array(6)
 for (let i=0; i<imgJewels.length; i++) 
     imgJewels[i] = document.getElementById(`st5-${i+1}`) as HTMLImageElement
 
+imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
 
 // SETUP FOR PLAYER 1
 let player1 = new CpuPlayer(document, "left", [0, 2, 4])

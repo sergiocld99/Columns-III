@@ -280,21 +280,18 @@ export default class Board {
         }
     }
 
-    poisonColumn(colIndex: number, srcMatrix: Cell[][]): number {
-        let count = 0
-        
+    poisonColumn(colIndex: number): number {
         for (let r=this.rowCount-1; r>=0; r--){
             let dest = this.matrix[r][colIndex]
-            let src = srcMatrix[r][colIndex]
-
-            if (src && dest) {
-                if (dest.color != src.color){
-                    dest.color = src.color
-                    if (++count == 3) break
-                }
-            } else break
+            
+            if (!dest){
+                let jw = new Jewel(Math.floor(Math.random() * 6))
+                jw.mysterious = true
+                this.matrix[r][colIndex] = jw
+                return 1
+            }
         }
 
-        return count
+        return 0
     }
 }
