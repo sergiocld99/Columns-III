@@ -36,7 +36,9 @@ player1.drawNextBlock(imgJewels)
 let player2 = new CpuPlayer(document, "right", 3)
 player2.drawNextBlock(imgJewels)
 
-// LOOPS FOR PLAYER 1
+// LOOPS
+let ticks = 0
+
 setInterval(() => {
     player1.loop()
     player2.loop()

@@ -7,8 +7,13 @@ type Position = [number, number]
 export default class Board {
     matrix: Cell[][]
     toClear: Position[] = []
+    rowCount: number
+    colCount: number
 
     constructor(rows: number, cols: number){
+        this.rowCount = rows
+        this.colCount = cols
+
         this.matrix = Array(rows)
         for (let i=0; i<rows; i++){
             this.matrix[i] = Array(cols).fill(null)
@@ -16,7 +21,7 @@ export default class Board {
     }
 
     getLastEmptyRow(col: number): number {
-        let row = this.matrix.length - 1
+        let row = this.rowCount - 1
 
         while (row >= 0 && this.matrix[row][col]) row--
         return row
@@ -35,53 +40,30 @@ export default class Board {
 
     // ---- AFTER BLOCK PLACED ----------------------------
 
-    /**
-     * 
-     * @param cols array of columns to check
-     * @param rows array of rows to check
-     * @returns should check again
-     */
-    check(cols: number[], rows: number[]) : boolean {
-        cols.forEach(c => this.checkColumn(c))
-        rows.forEach(r => this.checkRow(r))
-        
-        let checkAgain = this.toClear.length > 0
+    clearPending() {
         this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
         this.toClear = []
         this.applyGravityEverywhere()
-
-        return checkAgain
     }
 
-    checkEverything() : boolean {
-        const colsCount = this.matrix[0].length
-        const rowsCount = this.matrix.length
-        
-        for (let c=0; c<colsCount; c++){
-            this.checkColumn(c)
-        }
+    checkEverything() : boolean {        
+        for (let c=0; c<this.colCount; c++) this.checkColumn(c)
+        for (let r=0; r<this.rowCount; r++) this.checkRow(r)
+        //this.checkDescendingDiagonals()
 
-        for (let r=0; r<rowsCount; r++){
-            this.checkRow(r)
-        }
-
-        let checkAgain = this.toClear.length > 0
-        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
-        this.toClear = []
-        this.applyGravityEverywhere()
-
-        return checkAgain
+        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]]!.clearing = true)
+        return this.toClear.length > 0
     }
 
     checkColumn(col: number) {
-        let lastJewel = this.matrix[this.matrix.length-1][col]
+        let lastJewel = this.matrix[this.rowCount-1][col]
         if (!lastJewel) return
 
         let currentJewel: Cell
         let jewelsInRow = 1
         let r
 
-        for (r=this.matrix.length-2; r>=0; r--){
+        for (r=this.rowCount-2; r>=0; r--){
             currentJewel = this.matrix[r][col]
 
             // if cell is empty, finish checking
@@ -109,30 +91,27 @@ export default class Board {
         let row: Cell[] = this.matrix[r]
         let lastJewel: Cell = row[0]
         let jewelsInRow = lastJewel ? 1 : 0
-        let currentJewel
+        let currentJewel: Cell
         let c: number
 
-        for (c=1; c<row.length; c++){
+        for (c=1; c<this.colCount; c++){
             currentJewel = row[c]
             
-            if (!currentJewel){
+            if (currentJewel === null){
                 // cell is empty
                 if (jewelsInRow >= 3) this.clearRow(r,c-jewelsInRow,jewelsInRow)
                 jewelsInRow = 0
-                lastJewel = null
-            } else if (!lastJewel){
+            } else if (lastJewel === null || currentJewel.equals(lastJewel)){
                 // cell is not empty, but previous was
-                jewelsInRow++
-                lastJewel = currentJewel
-            } else if (currentJewel.equals(lastJewel)){
-                // jewel same than previous
+                // or jewel color is the same than previous
                 jewelsInRow++
             } else {
                 // jewel different than previous
                 if (jewelsInRow >= 3) this.clearRow(r, c-jewelsInRow, jewelsInRow)
                 jewelsInRow = 1
-                lastJewel = currentJewel
             }
+
+            lastJewel = currentJewel
         }
 
         // final checking
@@ -141,41 +120,58 @@ export default class Board {
         }
     }
 
+    checkDescendingDiagonals(){
+        for (let c=0; c<this.colCount-2; c++){
+            let lastJewel = this.matrix[0][c]
+            let jewelsInRow = lastJewel ? 1 : 0
+            let currentJewel: Cell
+            let r: number
+
+            for (r=1; r<this.rowCount; r++){
+                currentJewel = this.matrix[r][c]
+
+                if (currentJewel === null){
+                    if (jewelsInRow >= 3) this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
+                    jewelsInRow = 0
+                } else if (lastJewel === null || currentJewel.equals(lastJewel)){
+                    jewelsInRow++
+                } else {
+                    if (jewelsInRow >= 3) this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
+                    jewelsInRow = 1
+                }
+
+                lastJewel = currentJewel
+            }
+
+            // final checking
+            if (jewelsInRow >= 3){
+                this.clearDescendingDiagonal(r-jewelsInRow, c-jewelsInRow, jewelsInRow)
+            }
+        }
+    }
+
     clearColumn(col: number, topRow: number, count: number){
-        // clear jewels
         for (let i=0; i<count; i++){
-            //this.matrix[topRow+i][col] = null
             this.toClear.push([topRow+i, col])
         }
-
-        // apply gravity
-        //this.applyGravity(col, topRow-1, count)
     }
 
     clearRow(row: number, firstCol: number, count: number){
-        // clear jewels
         for (let c=firstCol; c<firstCol+count; c++){
-            //this.matrix[row][c] = null
-            //this.applyGravity(c, row-1, 1)
             this.toClear.push([row, c])
         }
     }
 
-    applyGravity(col: number, bottomRow: number, spaces: number){
-        let src: Cell
-
-        for (let r=bottomRow; r>=0; r--){
-            src = this.matrix[r][col]
-            this.matrix[r][col] = null
-            this.matrix[r+spaces][col] = src
+    clearDescendingDiagonal(rowStart: number, colStart: number, count: number){
+        for (let i=0; i<count; i++){
+            this.toClear.push([rowStart+i, colStart+i])
         }
     }
 
     applyGravityEverywhere(){
-        const cols = this.matrix[0].length
-        const bottomRow = this.matrix.length - 1
+        const bottomRow = this.rowCount - 1
 
-        for (let c=0; c<cols; c++){
+        for (let c=0; c<this.colCount; c++){
             let spaces = 0
             let temp: Cell
             
@@ -193,10 +189,10 @@ export default class Board {
 
     // ----------------------------------------------------
 
-    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D){
+    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D, ticks: number){
         this.matrix.forEach((row, y) => {
             row.forEach((jw, x) => {
-                if (jw) {
+                if (jw && (ticks % 10 < 5 || jw.clearing === false)) {
                     jw.draw(imgJewels, ctx, y, x)
                 }
             })

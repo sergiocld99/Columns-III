@@ -3,6 +3,7 @@ export const COLOR_VARIANTS_COUNT = 6
 
 export class Jewel {
     color: number
+    clearing = false
 
     constructor(color: number){
         this.color = color

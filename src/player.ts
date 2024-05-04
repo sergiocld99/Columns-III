@@ -22,6 +22,8 @@ export default class Player {
     // match status
     ready = true
     status = MatchStatus.FALLING_BLOCK
+    timesInState = 0
+    ticks = 0
 
     constructor(document: Document, preffix: string, maxColors = COLOR_VARIANTS_COUNT){
         this.maxColors = maxColors
@@ -54,6 +56,11 @@ export default class Player {
             case MatchStatus.CLEARING:
                 this.stepClearing()
                 break
+            case MatchStatus.APPLYING_GRAVITY:
+                this.stepGravity()
+                break
+            case MatchStatus.PAUSE:
+                break
         }
     }
 
@@ -67,18 +74,34 @@ export default class Player {
             
             if (success) {
                 this.status = MatchStatus.CLEARING
+                this.timesInState = 0
             } else {
                 this.board.reset()
             }
 
             this.fallingBlock = new FallingBlock(this.nextBlock)
-            this.nextBlock = new NextBlock(this.maxColors)
         }
     }
 
     private stepClearing(){
-        let recheck = this.board.checkEverything()
-        if (!recheck) this.status = MatchStatus.FALLING_BLOCK
+        if (this.timesInState === 0){
+            let recheck = this.board.checkEverything()
+            if (!recheck) {
+                this.status = MatchStatus.FALLING_BLOCK
+                
+                this.nextBlock = new NextBlock(this.maxColors)
+            }
+        } else if (this.timesInState >= 2){
+            this.status = MatchStatus.APPLYING_GRAVITY
+        }
+
+        this.timesInState++
+    }
+
+    private stepGravity(){
+        this.board.clearPending()
+        this.status = MatchStatus.CLEARING
+        this.timesInState = 0
     }
 
     drawNextBlock(imgJewels: HTMLImageElement[]) {
@@ -87,8 +110,10 @@ export default class Player {
     }
 
     drawBoard(imgJewels: HTMLImageElement[]){
+        this.ticks++
+
         this.boardCtx.clearRect(0,0, this.boardEl.width, this.boardEl.height)
-        this.board.draw(imgJewels, this.boardCtx)
+        this.board.draw(imgJewels, this.boardCtx, this.ticks)
         this.fallingBlock.draw(imgJewels, this.boardCtx)
     }
 }
