@@ -39,7 +39,7 @@ player2.drawNextBlock(imgJewels)
 setInterval(() => {
     player1.loop()
     player2.loop()
-}, 500)
+}, 200)
 
 setInterval(() => {
     player1.drawNextBlock(imgJewels)

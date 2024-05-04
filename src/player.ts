@@ -47,14 +47,19 @@ export default class Player {
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
             this.fallingBlock.row -= 0.5
 
-            this.board.placeBlock(this.fallingBlock)
-            this.board.checkColumn(this.fallingBlock.col)
-            this.board.checkRow(this.fallingBlock.row)
-            this.board.checkRow(this.fallingBlock.row+1)
-            this.board.checkRow(this.fallingBlock.row+2)
+            let success = this.board.placeBlock(this.fallingBlock)
+            
+            if (!success) {
+                this.board.reset()
+            } else {
+                this.board.checkColumn(this.fallingBlock.col)
+                this.board.checkRow(this.fallingBlock.row)
+                this.board.checkRow(this.fallingBlock.row+1)
+                this.board.checkRow(this.fallingBlock.row+2)
+            }
+
             this.fallingBlock = new FallingBlock(this.nextBlock)
             this.nextBlock = new NextBlock(this.maxColors)
-            //this.drawNextBlock(ctx, el, imgJewels)
         }
     }
 

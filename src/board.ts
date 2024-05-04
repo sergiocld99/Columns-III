@@ -20,13 +20,15 @@ export default class Board {
         return row
     }
 
-    placeBlock(block: Block){
+    placeBlock(block: Block): boolean {
         let r = Math.floor(block.row)
         
         for (let i=0; i<3; i++){
-            if (r+i < 0) continue
+            if (r+i < 0) return false
             this.matrix[r+i][block.col] = block.jewels[i]
         }
+
+        return true
     }
 
     // ---- AFTER BLOCK PLACED ----------------------------
@@ -127,6 +129,10 @@ export default class Board {
         }
     }
 
+    isColumnFull(col: number){
+        return this.matrix[0][col] != null
+    }
+
     // ----------------------------------------------------
 
     draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D){
@@ -136,6 +142,14 @@ export default class Board {
                     jw.draw(imgJewels, ctx, y, x)
                 }
             })
+        })
+    }
+
+    reset(){
+        this.matrix.forEach(row => {
+            for (let c=0; c<row.length; c++){
+                row[c] = null
+            }
         })
     }
 }
