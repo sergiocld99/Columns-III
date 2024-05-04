@@ -1,4 +1,4 @@
-import { COLOR_VARIANTS_COUNT } from "./jewel.js";
+import { COLOR_VARIANTS_COUNT } from "../jewel.js";
 import Player from "./player.js";
 
 export default class CpuPlayer extends Player {

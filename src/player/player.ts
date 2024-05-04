@@ -1,8 +1,8 @@
-import Board from "./board.js";
-import FallingBlock from "./fallingBlock.js";
-import { COLOR_VARIANTS_COUNT } from "./jewel.js";
-import MatchStatus from "./matchStatus.js";
-import NextBlock from "./nextBlock.js";
+import Board from "../board.js";
+import FallingBlock from "../fallingBlock.js";
+import { COLOR_VARIANTS_COUNT } from "../jewel.js";
+import MatchStatus from "../matchStatus.js";
+import NextBlock from "../nextBlock.js";
 
 export default class Player {
     nextBlock: NextBlock
@@ -38,14 +38,6 @@ export default class Player {
 
         this.boardEl = document.getElementById(`${preffix}_board`) as HTMLCanvasElement
         this.boardCtx = this.boardEl.getContext("2d")!
-
-        // KEY LISTENER
-        document.addEventListener("keydown", e => {
-            if (e.key === "ArrowLeft") this.fallingBlock.moveLeft(this.board)
-            else if (e.key === "ArrowRight") this.fallingBlock.moveRight(this.board)
-            else if (e.key === " ") this.fallingBlock.rotate()
-            else console.log(e.key)
-        })
     }
 
     loop(){

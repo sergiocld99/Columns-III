@@ -1,9 +1,5 @@
-import Block from "./block.js";
-import Board from "./board.js";
-import CpuPlayer from "./cpuPlayer.js";
-import FallingBlock from "./fallingBlock.js";
-import NextBlock from "./nextBlock.js";
-import Player from "./player.js";
+import CpuPlayer from "./player/cpuPlayer.js";
+import ManualPlayer from "./player/manualPlayer.js";
 
 function playMusic(name: string, initialSecs = 0) {
     const bgm = new Audio(`bgm/${name}.bgm`);
@@ -29,7 +25,7 @@ for (let i=0; i<imgJewels.length; i++)
 
 
 // SETUP FOR PLAYER 1
-let player1 = new Player(document, "left")
+let player1 = new ManualPlayer(document, "left")
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
@@ -37,8 +33,6 @@ let player2 = new CpuPlayer(document, "right", 3)
 player2.drawNextBlock(imgJewels)
 
 // LOOPS
-let ticks = 0
-
 setInterval(() => {
     player1.loop()
     player2.loop()
