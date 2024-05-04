@@ -1,3 +1,4 @@
+import MatchStatus from "./matchStatus.js";
 import CpuPlayer from "./player/cpuPlayer.js";
 import ManualPlayer from "./player/manualPlayer.js";
 
@@ -32,11 +33,15 @@ player1.drawNextBlock(imgJewels)
 let player2 = new CpuPlayer(document, "right", [1, 3, 5])
 player2.drawNextBlock(imgJewels)
 
+// SET OPPONENTS
+player1.opponent = player2
+player2.opponent = player1
+
 // LOOPS
 setInterval(() => {
     player1.loop()
     player2.loop()
-}, 200)
+}, 100)
 
 setInterval(() => {
     player1.drawNextBlock(imgJewels)

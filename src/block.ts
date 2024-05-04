@@ -17,5 +17,7 @@ export default abstract class Block {
         })
     }
 
-    
+    getColors(): number[] {
+        return [this.jewels[0].color, this.jewels[1].color, this.jewels[2].color]
+    }
 }

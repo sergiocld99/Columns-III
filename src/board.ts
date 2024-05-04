@@ -266,4 +266,35 @@ export default class Board {
 
         return res
     }
+
+    // ---- EFFECTS ----------------------
+
+    poisonRow(rowIndex: number, withRow: Cell[]){
+        const myLastRow = this.matrix[rowIndex]
+
+        for (let c=0; c<this.colCount; c++){
+            if (withRow[c] && myLastRow[c]) {
+                let src: Jewel = withRow[c]!
+                myLastRow[c]!.color = src.color
+            }
+        }
+    }
+
+    poisonColumn(colIndex: number, srcMatrix: Cell[][]): number {
+        let count = 0
+        
+        for (let r=this.rowCount-1; r>=0; r--){
+            let dest = this.matrix[r][colIndex]
+            let src = srcMatrix[r][colIndex]
+
+            if (src && dest) {
+                if (dest.color != src.color){
+                    dest.color = src.color
+                    if (++count == 3) break
+                }
+            } else break
+        }
+
+        return count
+    }
 }

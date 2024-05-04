@@ -9,6 +9,7 @@ export default class Player {
     fallingBlock: FallingBlock
     board: Board
     colors: number[]
+    opponent: Player | null  = null
 
     // HTML elements
     statsEl: HTMLDivElement
@@ -63,10 +64,10 @@ export default class Player {
     }
 
     private stepFalling(){
-        this.fallingBlock.row += 0.5
+        this.fallingBlock.row += 0.25
 
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
-            this.fallingBlock.row -= 0.5
+            this.fallingBlock.row -= 0.25
 
             let success = this.board.placeBlock(this.fallingBlock)
             
@@ -86,7 +87,15 @@ export default class Player {
     private stepClearing(){
         if (this.timesInState === 0){
             let recheck = this.board.checkEverything()
-            if (!recheck) this.status = MatchStatus.FALLING_BLOCK
+            if (!recheck) {
+                this.status = MatchStatus.FALLING_BLOCK
+
+                if (this.blueScore >= 30 && this.opponent){
+                    let randomIndex = Math.floor(Math.random() * this.board.colCount)
+                    let count = this.opponent.board.poisonColumn(randomIndex, this.board.matrix)
+                    this.updateBlueScore(-10 * count)
+                }
+            }
         } else if (this.timesInState >= 2){
             this.status = MatchStatus.APPLYING_GRAVITY
         }
@@ -95,17 +104,19 @@ export default class Player {
     }
 
     private stepGravity(){
-        let clears = Math.ceil(this.board.toClear.length / 3)
-        this.blueScore += (clears * this.multiplier)
-        this.clearCount += clears
+        let clears = Math.floor(this.board.toClear.length / 3) + (this.board.toClear.length % 3)
+        this.updateBlueScore(clears * this.multiplier)
+        
         this.board.clearPending()
         this.status = MatchStatus.CLEARING
         this.timesInState = 0
         this.multiplier += 4
 
-        this.blueEl.innerHTML = this.blueScore.toString()
+        this.clearCount += clears
         this.whiteEl.innerHTML = this.clearCount.toString()
     }
+
+    // ---- EFFECTS -----------------------------
 
     drawNextBlock(imgJewels: HTMLImageElement[]) {
         this.nextCtx.clearRect(0,0, this.nextEl.width, this.nextEl.height)
@@ -120,6 +131,19 @@ export default class Player {
         this.fallingBlock.draw(imgJewels, this.boardCtx)
     }
 
+    updateBlueScore(diff: number){
+        this.blueScore += diff
+        this.blueEl.innerHTML = this.blueScore.toString()
+
+        if (this.blueScore >= 30) this.blueEl.style.color = "red"
+        else this.blueEl.style.color = "aqua"
+    }
+
+    clearBlueScore(){
+        this.blueScore = 0
+        this.blueEl.innerHTML = this.blueScore.toString()
+    }
+
     reset(){
         this.board.reset()
         this.blueScore = 0
@@ -129,5 +153,7 @@ export default class Player {
         this.status = MatchStatus.FALLING_BLOCK
         this.timesInState = 0
         this.ticks = 0
+
+        this.opponent?.board?.reset()
     }
 }
