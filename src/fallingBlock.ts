@@ -9,7 +9,7 @@ export default class FallingBlock extends Block {
     }
 
     getBottomRow() : number {
-        return Math.floor(this.row + this.jewels.length - 1)
+        return Math.ceil(this.row + this.jewels.length - 1)
     }
 
     rotate(){

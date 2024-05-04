@@ -35,13 +35,42 @@ export default class Board {
 
     // ---- AFTER BLOCK PLACED ----------------------------
 
-    check(cols: number[], rows: number[]){
+    /**
+     * 
+     * @param cols array of columns to check
+     * @param rows array of rows to check
+     * @returns should check again
+     */
+    check(cols: number[], rows: number[]) : boolean {
         cols.forEach(c => this.checkColumn(c))
         rows.forEach(r => this.checkRow(r))
         
+        let checkAgain = this.toClear.length > 0
         this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
         this.toClear = []
         this.applyGravityEverywhere()
+
+        return checkAgain
+    }
+
+    checkEverything() : boolean {
+        const colsCount = this.matrix[0].length
+        const rowsCount = this.matrix.length
+        
+        for (let c=0; c<colsCount; c++){
+            this.checkColumn(c)
+        }
+
+        for (let r=0; r<rowsCount; r++){
+            this.checkRow(r)
+        }
+
+        let checkAgain = this.toClear.length > 0
+        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
+        this.toClear = []
+        this.applyGravityEverywhere()
+
+        return checkAgain
     }
 
     checkColumn(col: number) {

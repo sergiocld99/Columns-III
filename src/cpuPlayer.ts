@@ -9,13 +9,15 @@ export default class CpuPlayer extends Player {
     }
 
     loop(){
-        if (++this.ticks === 10){
+        if (++this.ticks >= 10 && this.fallingBlock.row > 0){
             this.ticks = 0
-            
-            if (Math.random() < 0.5){
+
+            if (Math.random() < 0.5 && this.fallingBlock.col != 3){
                 this.fallingBlock.moveLeft(this.board)
-            } else {
+            } else if (this.fallingBlock.col != 1) {
                 this.fallingBlock.moveRight(this.board)
+            } else {
+                this.fallingBlock.rotate()
             }
         }
 

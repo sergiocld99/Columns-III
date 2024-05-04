@@ -1,6 +1,7 @@
 import Board from "./board.js";
 import FallingBlock from "./fallingBlock.js";
 import { COLOR_VARIANTS_COUNT } from "./jewel.js";
+import MatchStatus from "./matchStatus.js";
 import NextBlock from "./nextBlock.js";
 
 export default class Player {
@@ -17,6 +18,10 @@ export default class Player {
     // context
     boardCtx: CanvasRenderingContext2D
     nextCtx: CanvasRenderingContext2D
+
+    // match status
+    ready = true
+    status = MatchStatus.FALLING_BLOCK
 
     constructor(document: Document, preffix: string, maxColors = COLOR_VARIANTS_COUNT){
         this.maxColors = maxColors
@@ -42,6 +47,17 @@ export default class Player {
     }
 
     loop(){
+        switch(this.status){
+            case MatchStatus.FALLING_BLOCK:
+                this.stepFalling()
+                break
+            case MatchStatus.CLEARING:
+                this.stepClearing()
+                break
+        }
+    }
+
+    private stepFalling(){
         this.fallingBlock.row += 0.5
 
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
@@ -49,27 +65,20 @@ export default class Player {
 
             let success = this.board.placeBlock(this.fallingBlock)
             
-            if (!success) {
-                this.board.reset()
+            if (success) {
+                this.status = MatchStatus.CLEARING
             } else {
-                this.board.check(
-                    [this.fallingBlock.col],
-                    [
-                        this.fallingBlock.row,
-                        this.fallingBlock.row+1,
-                        this.fallingBlock.row+2
-                    ]
-                )
-                
-                //this.board.checkColumn(this.fallingBlock.col)
-                //this.board.checkRow(this.fallingBlock.row)
-                //this.board.checkRow(this.fallingBlock.row+1)
-                //this.board.checkRow(this.fallingBlock.row+2)
+                this.board.reset()
             }
 
             this.fallingBlock = new FallingBlock(this.nextBlock)
             this.nextBlock = new NextBlock(this.maxColors)
         }
+    }
+
+    private stepClearing(){
+        let recheck = this.board.checkEverything()
+        if (!recheck) this.status = MatchStatus.FALLING_BLOCK
     }
 
     drawNextBlock(imgJewels: HTMLImageElement[]) {
