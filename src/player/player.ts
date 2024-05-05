@@ -130,6 +130,8 @@ export default class Player {
         let count = Math.floor(this.blueScore / 10)
         let targetIndex = (this.opponent.fallingBlock.col + 3) % this.board.colCount
 
+        if (count >= 3) this.sfx.playBigPush()
+
         for (let i = 0; i < count; i++) {
             let added = this.opponent.board.poisonColumn(targetIndex)
             if (added) this.updateBlueScore(-added * 10)
