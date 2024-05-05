@@ -1,7 +1,7 @@
 import Block from "./block.js";
-import Board from "./board.js";
-import { Jewel } from "./jewel.js";
-import SFX from "./sfx.js";
+import Board from "../board.js";
+import { Jewel } from "../jewel.js";
+import SFX from "../sfx.js";
 
 export default class FallingBlock extends Block {
 

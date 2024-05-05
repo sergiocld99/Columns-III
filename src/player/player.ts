@@ -1,9 +1,10 @@
 import Board from "../board.js";
-import FallingBlock from "../fallingBlock.js";
+import FallingBlock from "../block/fallingBlock.js";
 import { COLOR_VARIANTS_COUNT } from "../jewel.js";
 import MatchStatus from "../matchStatus.js";
-import NextBlock from "../nextBlock.js";
+import NextBlock from "../block/nextBlock.js";
 import SFX from "../sfx.js";
+import BlockGenerator from "../block/blockGenerator.js";
 
 export default class Player {
     nextBlock: NextBlock
@@ -14,6 +15,7 @@ export default class Player {
     // references
     opponent: Player | null = null
     sfx: SFX
+    blockGenerator: BlockGenerator
 
     // HTML elements
     statsEl: HTMLDivElement
@@ -33,13 +35,16 @@ export default class Player {
     timesInState = 0
     ticks = 0
     multiplier = 3
+    lastArrowCount = 0
+    currentBlockIndex = 0
 
-    constructor(document: Document, preffix: string, colors: number[], sfx: SFX) {
+    constructor(document: Document, preffix: string, colors: number[], sfx: SFX, blockGenerator: BlockGenerator) {
         this.colors = colors
-        this.fallingBlock = new FallingBlock(new NextBlock(colors))
-        this.nextBlock = new NextBlock(colors)
+        this.fallingBlock = new FallingBlock(blockGenerator.getCopy(this.currentBlockIndex))
+        this.nextBlock = blockGenerator.getCopy(++this.currentBlockIndex)
         this.board = new Board(13, 6)
         this.sfx = sfx
+        this.blockGenerator = blockGenerator
 
         // HTML references
         this.statsEl = document.getElementById(`${preffix}_stats`) as HTMLDivElement
@@ -84,8 +89,7 @@ export default class Player {
                 this.reset()
             }
 
-            this.fallingBlock = new FallingBlock(this.nextBlock)
-            this.nextBlock = new NextBlock(this.colors)
+            this.nextFallingBlock()
         }
     }
 
@@ -100,6 +104,14 @@ export default class Player {
 
                 if (this.multiplier < 7 && this.blueScore >= 10) {
                     this.poisonOpponent()
+                    this.opponent?.nextFallingBlock()
+                }
+
+                // arrow generation
+                if (this.clearCount >= this.lastArrowCount + 20){
+                    this.sfx.playSummonArrow()
+                    this.lastArrowCount = this.clearCount
+                    this.board.clearColor(this.fallingBlock.jewels[2].color)
                 }
             }
         } else if (this.timesInState >= 4) {
@@ -147,6 +159,11 @@ export default class Player {
         }
     }
 
+    nextFallingBlock(){
+        this.fallingBlock = new FallingBlock(this.nextBlock)
+        this.nextBlock = this.blockGenerator.getCopy(++this.currentBlockIndex)
+    }
+
     drawNextBlock(imgJewels: HTMLImageElement[]) {
         this.nextCtx.clearRect(0, 0, this.nextEl.width, this.nextEl.height)
         this.nextBlock.draw(imgJewels, this.nextCtx)
@@ -177,6 +194,7 @@ export default class Player {
         this.board.reset()
         this.blueScore = 0
         this.clearCount = 0
+        this.lastArrowCount = 0
         this.blueEl.innerHTML = this.blueScore.toString()
         this.whiteEl.innerHTML = this.clearCount.toString()
         this.status = MatchStatus.FALLING_BLOCK

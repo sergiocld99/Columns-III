@@ -1,4 +1,4 @@
-import Block from "./block.js";
+import Block from "./block/block.js";
 import { Jewel } from "./jewel.js";
 
 type Cell = Jewel | null
@@ -293,5 +293,16 @@ export default class Board {
         }
 
         return 0
+    }
+
+    clearColor(color: number){
+        this.matrix.forEach((row, y) => {
+            row.forEach((jw, x) => {
+                if (jw && jw.color === color){
+                    this.toClear.push([y,x])
+                    jw.clearing = true
+                }
+            })
+        })
     }
 }

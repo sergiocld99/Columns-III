@@ -1,6 +1,6 @@
 import Block from "./block.js";
-import { Jewel } from "./jewel.js";
-import { randInt } from "./utils.js";
+import { Jewel } from "../jewel.js";
+import { randInt } from "../utils.js";
 
 export default class NextBlock extends Block {
 
@@ -10,6 +10,9 @@ export default class NextBlock extends Block {
     }
 
     clone() : NextBlock {
-        return new NextBlock(this.getColors())
+        let copy = new NextBlock([0])
+        copy.jewels = []
+        this.getColors().forEach(c => copy.jewels.push(new Jewel(c)))
+        return copy
     }
 }

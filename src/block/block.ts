@@ -1,5 +1,5 @@
 // Block of 3 jewels
-import { Jewel } from "./jewel.js";
+import { Jewel } from "../jewel.js";
 
 export default abstract class Block {
     jewels: Jewel[] = []
