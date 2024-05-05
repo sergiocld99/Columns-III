@@ -3,13 +3,17 @@ import FallingBlock from "../fallingBlock.js";
 import { COLOR_VARIANTS_COUNT } from "../jewel.js";
 import MatchStatus from "../matchStatus.js";
 import NextBlock from "../nextBlock.js";
+import SFX from "../sfx.js";
 
 export default class Player {
     nextBlock: NextBlock
     fallingBlock: FallingBlock
     board: Board
     colors: number[]
+
+    // references
     opponent: Player | null  = null
+    sfx: SFX
 
     // HTML elements
     statsEl: HTMLDivElement
@@ -30,11 +34,12 @@ export default class Player {
     ticks = 0
     multiplier = 3
 
-    constructor(document: Document, preffix: string, colors: number[]){
+    constructor(document: Document, preffix: string, colors: number[], sfx: SFX){
         this.colors = colors
         this.fallingBlock = new FallingBlock(new NextBlock(colors))
         this.nextBlock = new NextBlock(colors)
         this.board = new Board(13,6)
+        this.sfx = sfx
 
         // HTML references
         this.statsEl = document.getElementById(`${preffix}_stats`) as HTMLDivElement
@@ -87,13 +92,16 @@ export default class Player {
     private stepClearing(){
         if (this.timesInState === 0){
             let recheck = this.board.checkEverything()
-            if (!recheck) {
+            
+            if (recheck){
+                this.sfx.playClear(Math.ceil(this.multiplier / 4))
+            } else {
                 this.status = MatchStatus.FALLING_BLOCK
 
-                if (this.blueScore >= 30 && this.opponent){
+                if (this.multiplier > 7 && this.opponent){
                     let count = Math.floor(this.blueScore / 10)
                     let targetIndex = (this.opponent.fallingBlock.col + 3) % this.board.colCount
-                    
+
                     for (let i=0; i<count; i++) {
                         let added = this.opponent.board.poisonColumn(targetIndex)
                         if (added) this.updateBlueScore(-added * 10)

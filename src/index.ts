@@ -1,6 +1,7 @@
 import MatchStatus from "./matchStatus.js";
 import CpuPlayer from "./player/cpuPlayer.js";
 import ManualPlayer from "./player/manualPlayer.js";
+import SFX from "./sfx.js";
 
 function playMusic(name: string, initialSecs = 0) {
     const bgm = new Audio(`bgm/${name}.bgm`);
@@ -26,12 +27,15 @@ for (let i=0; i<imgJewels.length; i++)
 
 imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
 
+// COMMON SETUP
+const sfx = new SFX(5)
+
 // SETUP FOR PLAYER 1
-let player1 = new CpuPlayer(document, "left", [0, 2, 4])
+let player1 = new CpuPlayer(document, "left", [0, 2, 4], sfx)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
-let player2 = new CpuPlayer(document, "right", [1, 3, 5])
+let player2 = new CpuPlayer(document, "right", [1, 3, 5], sfx)
 player2.drawNextBlock(imgJewels)
 
 // SET OPPONENTS

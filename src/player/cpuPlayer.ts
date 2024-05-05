@@ -1,11 +1,12 @@
 import { COLOR_VARIANTS_COUNT } from "../jewel.js";
+import SFX from "../sfx.js";
 import Player from "./player.js";
 
 export default class CpuPlayer extends Player {
     auxTicks = 0
 
-    constructor(document: Document, preffix: string, colors: number[]){
-        super(document, preffix, colors)
+    constructor(document: Document, preffix: string, colors: number[], sfx: SFX){
+        super(document, preffix, colors, sfx)
     }
 
     loop(){
