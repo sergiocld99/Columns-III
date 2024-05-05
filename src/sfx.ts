@@ -13,7 +13,20 @@ export default class SFX {
                 break
             default:
                 this.playDelayed(`st1-c${i}`, 250)
+                break
         }
+    }
+
+    playRotate(){
+        this.playSound(`st${this.stage === 4 ? 4 : 1}-rotate`)
+    }
+
+    playSummonArrow(){
+        this.playSound("arrow")
+    }
+
+    playBigPush(){
+        this.playSound("big-push")
     }
 
     private playDelayed(name: string, delayMs: number){

@@ -12,7 +12,7 @@ export default class Player {
     colors: number[]
 
     // references
-    opponent: Player | null  = null
+    opponent: Player | null = null
     sfx: SFX
 
     // HTML elements
@@ -34,11 +34,11 @@ export default class Player {
     ticks = 0
     multiplier = 3
 
-    constructor(document: Document, preffix: string, colors: number[], sfx: SFX){
+    constructor(document: Document, preffix: string, colors: number[], sfx: SFX) {
         this.colors = colors
         this.fallingBlock = new FallingBlock(new NextBlock(colors))
         this.nextBlock = new NextBlock(colors)
-        this.board = new Board(13,6)
+        this.board = new Board(13, 6)
         this.sfx = sfx
 
         // HTML references
@@ -52,8 +52,8 @@ export default class Player {
         this.boardCtx = this.boardEl.getContext("2d")!
     }
 
-    loop(){
-        switch(this.status){
+    loop() {
+        switch (this.status) {
             case MatchStatus.FALLING_BLOCK:
                 this.stepFalling()
                 break
@@ -68,14 +68,14 @@ export default class Player {
         }
     }
 
-    private stepFalling(){
+    private stepFalling() {
         this.fallingBlock.row += 0.25
 
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
             this.fallingBlock.row -= 0.25
 
             let success = this.board.placeBlock(this.fallingBlock)
-            
+
             if (success) {
                 this.status = MatchStatus.CLEARING
                 this.timesInState = 0
@@ -89,43 +89,30 @@ export default class Player {
         }
     }
 
-    private stepClearing(){
-        if (this.timesInState === 0){
+    private stepClearing() {
+        if (this.timesInState === 0) {
             let recheck = this.board.checkEverything()
-            
-            if (recheck){
+
+            if (recheck) {
                 this.sfx.playClear(Math.ceil(this.multiplier / 4))
             } else {
                 this.status = MatchStatus.FALLING_BLOCK
 
-                if (this.multiplier > 7 && this.opponent){
-                    let count = Math.floor(this.blueScore / 10)
-                    let targetIndex = (this.opponent.fallingBlock.col + 3) % this.board.colCount
-
-                    for (let i=0; i<count; i++) {
-                        let added = this.opponent.board.poisonColumn(targetIndex)
-                        if (added) this.updateBlueScore(-added * 10)
-                    }
-
-                    // random
-                    while(this.blueScore >= 10){
-                        let randomIndex = Math.floor(Math.random() * this.board.colCount)
-                        let added = this.opponent.board.poisonColumn(randomIndex)
-                        if (added) this.updateBlueScore(-added * 10)
-                    }
+                if (this.multiplier < 7 && this.blueScore >= 10) {
+                    this.poisonOpponent()
                 }
             }
-        } else if (this.timesInState >= 4){
+        } else if (this.timesInState >= 4) {
             this.status = MatchStatus.APPLYING_GRAVITY
         }
 
         this.timesInState++
     }
 
-    private stepGravity(){
+    private stepGravity() {
         let clears = Math.floor(this.board.toClear.length / 3) + (this.board.toClear.length % 3)
-        this.updateBlueScore(clears * this.multiplier)
-        
+        this.updateBlueScore(clears * this.multiplier * (Math.floor(this.blueScore / 30) + 1))
+
         this.board.clearPending()
         this.status = MatchStatus.CLEARING
         this.timesInState = 0
@@ -137,20 +124,41 @@ export default class Player {
 
     // ---- EFFECTS -----------------------------
 
+    poisonOpponent() {
+        if (!this.opponent) return
+
+        let count = Math.floor(this.blueScore / 10)
+        let targetIndex = (this.opponent.fallingBlock.col + 3) % this.board.colCount
+
+        for (let i = 0; i < count; i++) {
+            let added = this.opponent.board.poisonColumn(targetIndex)
+            if (added) this.updateBlueScore(-added * 10)
+        }
+
+        // random
+        let attemptsLeft = 100
+
+        while (this.blueScore >= 10 && --attemptsLeft > 0) {
+            let randomIndex = Math.floor(Math.random() * this.board.colCount)
+            let added = this.opponent.board.poisonColumn(randomIndex)
+            if (added) this.updateBlueScore(-added * 10)
+        }
+    }
+
     drawNextBlock(imgJewels: HTMLImageElement[]) {
-        this.nextCtx.clearRect(0,0, this.nextEl.width, this.nextEl.height)
+        this.nextCtx.clearRect(0, 0, this.nextEl.width, this.nextEl.height)
         this.nextBlock.draw(imgJewels, this.nextCtx)
     }
 
-    drawBoard(imgJewels: HTMLImageElement[]){
+    drawBoard(imgJewels: HTMLImageElement[]) {
         this.ticks++
 
-        this.boardCtx.clearRect(0,0, this.boardEl.width, this.boardEl.height)
+        this.boardCtx.clearRect(0, 0, this.boardEl.width, this.boardEl.height)
         this.board.draw(imgJewels, this.boardCtx, this.ticks)
         this.fallingBlock.draw(imgJewels, this.boardCtx)
     }
 
-    updateBlueScore(diff: number){
+    updateBlueScore(diff: number) {
         this.blueScore += diff
         this.blueEl.innerHTML = this.blueScore.toString()
 
@@ -158,12 +166,12 @@ export default class Player {
         else this.blueEl.style.color = "aqua"
     }
 
-    clearBlueScore(){
+    clearBlueScore() {
         this.blueScore = 0
         this.blueEl.innerHTML = this.blueScore.toString()
     }
 
-    reset(){
+    reset() {
         this.board.reset()
         this.blueScore = 0
         this.clearCount = 0

@@ -25,7 +25,7 @@ export default class CpuPlayer extends Player {
         if (this.auxTicks % 5 === 0){
             let topCell = this.board.getTopCell(this.fallingBlock.col)
             if (topCell && !this.fallingBlock.getBottomJewel().equals(topCell)){
-                this.fallingBlock.rotate()
+                this.fallingBlock.rotate(this.sfx)
             }
         }
 

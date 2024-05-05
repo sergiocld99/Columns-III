@@ -11,7 +11,7 @@ export default class ManualPlayer extends Player {
         document.addEventListener("keydown", e => {
             if (e.key === "ArrowLeft") this.fallingBlock.moveLeft(this.board)
             else if (e.key === "ArrowRight") this.fallingBlock.moveRight(this.board)
-            else if (e.key === " ") this.fallingBlock.rotate()
+            else if (e.key === " ") this.fallingBlock.rotate(sfx)
             else console.log(e.key)
         })
     }

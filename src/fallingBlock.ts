@@ -1,6 +1,7 @@
 import Block from "./block.js";
 import Board from "./board.js";
 import { Jewel } from "./jewel.js";
+import SFX from "./sfx.js";
 
 export default class FallingBlock extends Block {
 
@@ -13,7 +14,8 @@ export default class FallingBlock extends Block {
         return Math.ceil(this.row + this.jewels.length - 1)
     }
 
-    rotate(){
+    rotate(sfx: SFX){
+        sfx.playRotate()
         this.jewels = [this.jewels[2], this.jewels[0], this.jewels[1]]    
     }
 
