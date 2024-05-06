@@ -1,10 +1,11 @@
 import Board from "../board.js";
 import FallingBlock from "../block/fallingBlock.js";
-import { COLOR_VARIANTS_COUNT } from "../jewel.js";
+import { COLOR_VARIANTS_COUNT, MagicStoneJewels } from "../jewel.js";
 import MatchStatus from "../matchStatus.js";
 import NextBlock from "../block/nextBlock.js";
 import SFX from "../sfx.js";
 import BlockGenerator from "../block/blockGenerator.js";
+import MagicStone from "../block/magicStone.js";
 
 export default class Player {
     nextBlock: NextBlock
@@ -86,6 +87,27 @@ export default class Player {
                 this.status = MatchStatus.CLEARING
                 this.timesInState = 0
                 this.multiplier = 3
+
+                // check if it's magic stone
+                if (this.fallingBlock.isMagicStone()){
+                    switch (this.fallingBlock.getBottomJewel().color){
+                        case MagicStoneJewels.PUSH_UP:
+                            // push opponent
+                            this.pushOpponentUsingArrow()
+                            break
+                        case MagicStoneJewels.CLEAR:
+                            // clear
+                            let topCell = this.board.getTopCell(this.fallingBlock.col)
+                            if (topCell) this.board.clearColor(topCell.color)
+                            break
+                        case MagicStoneJewels.PUSH_DOWN:
+                            // push down
+                            this.board.removeColumn(this.fallingBlock.col)
+                            this.sfx.playNormalPush()
+                            break
+                    }
+                }
+
             } else {
                 this.pause()
             }
@@ -113,8 +135,9 @@ export default class Player {
                 if (this.clearCount >= this.lastArrowCount + 20){
                     this.sfx.playSummonArrow()
                     this.lastArrowCount = this.clearCount
-                    this.board.clearMysterious()
+                    //this.board.clearMysterious()
                     //this.board.clearColor(this.fallingBlock.jewels[2].color)
+                    this.nextBlock = new MagicStone()
                 }
             }
         } else if (this.timesInState >= 4) {
@@ -139,19 +162,36 @@ export default class Player {
 
     // ---- EFFECTS -----------------------------
 
+    public breakFallingBlock(): void {
+        if (this.status === MatchStatus.FALLING_BLOCK){
+            this.nextFallingBlock()
+            this.sfx.playBreak()
+        }
+    }
+
     private shouldPush(): boolean {
         if (this.blueScore < 10) return false
         return this.blueScore >= 30 || (this.autoPush && this.blueScore % 10 < 3)
     }
 
+    private pushOpponentUsingArrow(){
+        if (!this.opponent) return
+        this.opponent.breakFallingBlock()
+        this.sfx.playNormalPush()
+
+        let attemptsLeft = 100
+        let trashPushed = 0
+
+        while (--attemptsLeft > 0 && trashPushed < 2){
+            let randomIndex = Math.floor(Math.random() * this.board.colCount)
+            let added = this.opponent.board.poisonColumn(randomIndex)
+            if (added) trashPushed++
+        }
+    }
+
     protected pushOpponent() {
         if (!this.opponent || this.blueScore < 10 || this.status != MatchStatus.FALLING_BLOCK) return
-
-        // break falling block
-        if (this.opponent.status === MatchStatus.FALLING_BLOCK){
-            this.opponent.nextFallingBlock()
-            this.sfx.playBreak()
-        }
+        this.opponent.breakFallingBlock()
 
         let count = Math.floor(this.blueScore / 10)
         if (count >= 3) this.sfx.playBigPush()

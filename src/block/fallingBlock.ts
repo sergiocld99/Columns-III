@@ -59,6 +59,10 @@ export default class FallingBlock extends Block {
         return this.jewels[0].equals(this.jewels[1])
     }
 
+    isMagicStone(): boolean {
+        return this.jewels[0].isMagicStoneType()
+    }
+
     private getUniqueColorCount(): number {
         let colors = new Set<number>
         this.jewels.forEach(j => colors.add(j.color))

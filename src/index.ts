@@ -6,11 +6,7 @@ import SFX from "./sfx.js";
 import { randInt } from "./utils.js";
 
 const STAGE = randInt(3) + 3
-
-setTimeout(() => {
-    sfx.playBgm()
-}, 3000);
-
+setTimeout(() => sfx.playBgm(), 3000);
 
 let imgJewels: HTMLImageElement[] = Array(6)
 for (let i=0; i<imgJewels.length; i++) 
@@ -18,12 +14,17 @@ for (let i=0; i<imgJewels.length; i++)
 
 imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
 
+// magic stone
+for (let i=0; i<3; i++){
+    imgJewels.push(document.getElementById(`ms-${i+1}`) as HTMLImageElement)
+}
+
 // COMMON SETUP
 const sfx = new SFX(STAGE)
 const blockGenerator = new BlockGenerator([0, 3, 4, 5])
 
 // SETUP FOR PLAYER 1
-let player1 = new ManualPlayer(document, "left", sfx, blockGenerator)
+let player1 = new CpuPlayer(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2

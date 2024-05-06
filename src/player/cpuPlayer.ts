@@ -17,6 +17,7 @@ export default class CpuPlayer extends Player {
         super.reset()
         this.doNotMove = false
         this.targetCol = 0
+        this.speed = 0.20
     }
 
     nextFallingBlock(): void {
@@ -32,8 +33,6 @@ export default class CpuPlayer extends Player {
             this.targetCol = 0
             this.speed = 0.10
             return
-        } else {
-            this.speed = 0.20
         }
 
         // build column candidates
@@ -93,12 +92,26 @@ export default class CpuPlayer extends Player {
         }
 
         if (this.auxTicks % 5 === 0){
-            //let topCell = this.board.getTopCell(this.fallingBlock.col)
+            let topCell = this.board.getTopCell(this.fallingBlock.col)
             let bottom1 = this.fallingBlock.getBottomJewel()
             let bottom2 = this.fallingBlock.getMediumJewel()
 
-            if (this.board.canClear(bottom1, bottom2, this.fallingBlock.col)){
+            if (this.fallingBlock.isMagicStone()){
+                this.speed = 0.20
+
+                if (topCell?.mysterious){
+                    if (!this.fallingBlock.getBottomJewel().isPushDownType())
+                        this.fallingBlock.rotate(this.sfx)
+                } else if (!topCell){
+                    if (!this.fallingBlock.getBottomJewel().isPushUpType()) 
+                        this.fallingBlock.rotate(this.sfx)
+                } else {
+                    if (!this.fallingBlock.getBottomJewel().isClearType())
+                        this.fallingBlock.rotate(this.sfx)
+                }
+            } else if (this.board.canClear(bottom1, bottom2, this.fallingBlock.col)){
                 this.doNotMove = true
+                this.speed = 0.20
             } else {
                 if (this.board.isColumnEmpty(this.fallingBlock.col)){
                     if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){

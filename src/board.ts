@@ -1,4 +1,5 @@
 import Block from "./block/block.js";
+import FallingBlock from "./block/fallingBlock.js";
 import { Jewel } from "./jewel.js";
 
 type Cell = Jewel | null
@@ -28,10 +29,11 @@ export default class Board {
         return row
     }
 
-    placeBlock(block: Block): boolean {
+    placeBlock(block: FallingBlock): boolean {
         let r = Math.round(block.row)
         
-        for (let i=0; i<3; i++){
+        // from bottom to top
+        for (let i=2; i>=0; i--){
             if (r+i < 0) return false
             this.matrix[r+i][block.col] = block.jewels[i]
         }
@@ -81,7 +83,7 @@ export default class Board {
             if (lastJewel.equals(currentJewel)) jewelsInRow++
             else {
                 // clear jewels if there are at least 3 in row
-                if (jewelsInRow >= 3) this.clearColumn(col, r+1, jewelsInRow)
+                if (jewelsInRow >= 3) this.clearColumn(col, r+1, jewelsInRow, lastJewel)
 
                 lastJewel = currentJewel
                 jewelsInRow = 1
@@ -91,7 +93,7 @@ export default class Board {
 
         // final checking
         if (jewelsInRow >= 3){
-            this.clearColumn(col, r+1, jewelsInRow)
+            this.clearColumn(col, r+1, jewelsInRow, lastJewel)
         }
     }
 
@@ -190,12 +192,12 @@ export default class Board {
         }
     }
 
-    clearColumn(col: number, topRow: number, count: number){
+    clearColumn(col: number, topRow: number, count: number, jw: Jewel){
         for (let i=0; i<count; i++){
             this.toClear.push([topRow+i, col])
         }
 
-        this.currentClearCount += (count - 2)
+        if (!jw.isMagicStoneType()) this.currentClearCount += (count - 2)
     }
 
     clearRow(row: number, firstCol: number, count: number){
@@ -286,7 +288,8 @@ export default class Board {
         let res = null
         let r = 0
 
-        while (res === null && r < this.rowCount){
+        // from top to bottom
+        while (r < this.rowCount && (res === null || res.isMagicStoneType())){
             res = this.matrix[r][col]
             r++
         }
@@ -397,5 +400,11 @@ export default class Board {
                 }
             })
         })
+    }
+
+    removeColumn(col: number){
+        for (let r=0; r<this.rowCount; r++){
+            this.matrix[r][col] = null
+        }
     }
 }
