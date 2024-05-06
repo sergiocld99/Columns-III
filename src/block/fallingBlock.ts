@@ -4,10 +4,12 @@ import { Jewel } from "../jewel.js";
 import SFX from "../sfx.js";
 
 export default class FallingBlock extends Block {
+    colorCount: number
 
     constructor(nextBlock: Block){
         super(2, -3)
         nextBlock.jewels.forEach(j => this.jewels.push(j))
+        this.colorCount = this.getUniqueColorCount()
     }
 
     getBottomRow() : number {
@@ -19,22 +21,28 @@ export default class FallingBlock extends Block {
         this.jewels = [this.jewels[2], this.jewels[0], this.jewels[1]]    
     }
 
-    moveLeft(board: Board){
+    moveLeft(board: Board): boolean {
         if (this.col > 0) {
             if (board.matrix[this.getBottomRow()][this.col-1] === null){
                 this.col--
+                return true
             }
         }
+
+        return false
     }
 
-    moveRight(board: Board){
+    moveRight(board: Board): boolean {
         const boardCols = board.matrix[0].length
 
         if (this.col < boardCols){
             if (board.matrix[this.getBottomRow()][this.col+1] === null){
                 this.col++
+                return true
             }
         } 
+
+        return false
     }
 
     // ---- CPU STRATEGIES ----------
@@ -51,7 +59,7 @@ export default class FallingBlock extends Block {
         return this.jewels[0].equals(this.jewels[1])
     }
 
-    getUniqueColorCount(): number {
+    private getUniqueColorCount(): number {
         let colors = new Set<number>
         this.jewels.forEach(j => colors.add(j.color))
         return colors.size

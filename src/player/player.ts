@@ -10,7 +10,6 @@ export default class Player {
     nextBlock: NextBlock
     fallingBlock: FallingBlock
     board: Board
-    colors: number[]
 
     // references
     opponent: Player | null = null
@@ -38,8 +37,7 @@ export default class Player {
     lastArrowCount = 0
     currentBlockIndex = 0
 
-    constructor(document: Document, preffix: string, colors: number[], sfx: SFX, blockGenerator: BlockGenerator) {
-        this.colors = colors
+    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator) {
         this.fallingBlock = new FallingBlock(blockGenerator.getCopy(this.currentBlockIndex))
         this.nextBlock = blockGenerator.getCopy(++this.currentBlockIndex)
         this.board = new Board(13, 6)
@@ -73,7 +71,7 @@ export default class Player {
         }
     }
 
-    private stepFalling() {
+    protected stepFalling() {
         this.fallingBlock.row += 0.25
 
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
@@ -86,7 +84,7 @@ export default class Player {
                 this.timesInState = 0
                 this.multiplier = 3
             } else {
-                this.reset()
+                this.pause()
             }
 
             this.nextFallingBlock()
@@ -112,7 +110,8 @@ export default class Player {
                 if (this.clearCount >= this.lastArrowCount + 20){
                     this.sfx.playSummonArrow()
                     this.lastArrowCount = this.clearCount
-                    this.board.clearColor(this.fallingBlock.jewels[2].color)
+                    this.board.clearMysterious()
+                    //this.board.clearColor(this.fallingBlock.jewels[2].color)
                 }
             }
         } else if (this.timesInState >= 4) {
@@ -207,6 +206,11 @@ export default class Player {
         this.timesInState = 0
         this.ticks = 0
 
-        this.opponent?.board?.reset()
+        this.opponent?.reset()
+    }
+
+    pause(){
+        this.status = MatchStatus.PAUSE
+        this.opponent?.pause()
     }
 }

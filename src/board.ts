@@ -278,6 +278,10 @@ export default class Board {
         return h
     }
 
+    isColumnEmpty(col: number): boolean {
+        return this.matrix[this.rowCount-1][col] === null
+    }
+
     getTopCell(col: number) : Cell {
         let res = null
         let r = 0
@@ -296,20 +300,50 @@ export default class Board {
         while (r < this.rowCount && this.matrix[r][col] === null) r++
 
         if (r === this.rowCount - 1){
+            // column height is 1
             let top = this.matrix[r][col]!
-            return (bottom2.color === bottom1.color && bottom1.color === top.color)
+            if (bottom2.color === bottom1.color && bottom1.color === top.color) return true
         } else if ((r+1) < this.rowCount){
+            // column height is greater than 1
             let top1 = this.matrix[r][col]!
             let top2 = this.matrix[r+1][col]!
 
             if (bottom1.color === top1.color){
-                if (top1.color === top2.color) return true
-                else return (bottom2.color === bottom1.color)
-            } else {
-                return false
+                if (top1.color === top2.color || bottom2.color === bottom1.color) return true
+            }
+        }
+
+        // check bottom row
+        if (r-2 >= 0){
+            if (col > 2){
+                let left1 = this.matrix[r-1][col-1]
+                let left2 = this.matrix[r-1][col-2]
+                let left3 = this.matrix[r-2][col-1]
+                let left4 = this.matrix[r-2][col-2]
+
+                if (left1 && left2){
+                    if (left2.color === left1.color && left1.color === bottom1.color) return true
+                }
+
+                if (left3 && left4){
+                    if (left4.color === left3.color && left3.color === bottom2.color) return true
+                }
             }
 
-            // return (jewel.color === top1.color && top1.color === top2.color)
+            if (col < 4){
+                let right1 = this.matrix[r-1][col+1]
+                let right2 = this.matrix[r-1][col+2]
+                let right3 = this.matrix[r-2][col+1]
+                let right4 = this.matrix[r-2][col+2]
+
+                if (right1 && right2){
+                    if (right2.color === right1.color && right1.color === bottom1.color) return true
+                }
+
+                if (right3 && right4){
+                    if (right4.color === right3.color && right3.color === bottom2.color) return true
+                }
+            }
         }
 
         return false
@@ -347,6 +381,17 @@ export default class Board {
         this.matrix.forEach((row, y) => {
             row.forEach((jw, x) => {
                 if (jw && jw.color === color){
+                    this.toClear.push([y,x])
+                    jw.clearing = true
+                }
+            })
+        })
+    }
+
+    clearMysterious(){
+        this.matrix.forEach((row, y) => {
+            row.forEach((jw, x) => {
+                if (jw && jw.mysterious){
                     this.toClear.push([y,x])
                     jw.clearing = true
                 }

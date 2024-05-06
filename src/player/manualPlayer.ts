@@ -5,8 +5,8 @@ import Player from "./player.js";
 
 export default class ManualPlayer extends Player {
 
-    constructor(document: Document, preffix: string, colors: number[], sfx: SFX, blockGenerator: BlockGenerator){
-        super(document, preffix, colors, sfx, blockGenerator)
+    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
+        super(document, preffix, sfx, blockGenerator)
 
         // KEY LISTENER
         document.addEventListener("keydown", e => {

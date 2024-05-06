@@ -9,13 +9,28 @@ export default class CpuPlayer extends Player {
     doNotMove = false
     targetCol = 0
 
-    constructor(document: Document, preffix: string, colors: number[], sfx: SFX, blockGenerator: BlockGenerator){
-        super(document, preffix, colors, sfx, blockGenerator)
+    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
+        super(document, preffix, sfx, blockGenerator)
+    }
+
+    reset(): void {
+        super.reset()
+        this.doNotMove = false
+        this.targetCol = 0
     }
 
     nextFallingBlock(): void {
         super.nextFallingBlock()
         this.doNotMove = false
+
+        // is player in risk?
+        if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
+            this.targetCol = 5
+            return
+        } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
+            this.targetCol = 0
+            return
+        }
 
         // build column candidates
         let candidates = new Set<number>
@@ -23,7 +38,7 @@ export default class CpuPlayer extends Player {
         candidates.delete(2)
 
         // get block type
-        let colorCount = this.fallingBlock.getUniqueColorCount()
+        let colorCount = this.fallingBlock.colorCount
         let currentHeight: number
 
         if (colorCount === 3){
@@ -58,51 +73,39 @@ export default class CpuPlayer extends Player {
         
     }
 
-    loop(){
+    stepFalling(){
+        super.stepFalling()
         this.auxTicks++
 
         if (this.auxTicks >= 7 && this.fallingBlock.row > -1 && !this.doNotMove){
             this.auxTicks = 0
 
             let currentCol = this.fallingBlock.col
-            if (currentCol === this.targetCol) this.doNotMove = true
-            else if (currentCol > this.targetCol) this.fallingBlock.moveLeft(this.board)
-            else this.fallingBlock.moveRight(this.board)
+            let success = true
 
-            // if (Math.random() < 0.5 && this.fallingBlock.col < 3){
-            //     this.fallingBlock.moveLeft(this.board)
-            // } else if (this.fallingBlock.col > 1) {
-            //     this.fallingBlock.moveRight(this.board)
-            // }
+            if (currentCol === this.targetCol) this.doNotMove = true
+            else if (currentCol > this.targetCol) success = this.fallingBlock.moveLeft(this.board)
+            else success = this.fallingBlock.moveRight(this.board)
         }
 
         if (this.auxTicks % 5 === 0){
-            let topCell = this.board.getTopCell(this.fallingBlock.col)
-
-            if (topCell){
-                if (this.fallingBlock.getBottomJewel().equals(topCell)){
-                    //if (this.fallingBlock.col != 2) this.doNotMove = true
-                } else {
-                    //this.doNotMove = false
-                    this.fallingBlock.rotate(this.sfx)
-                }
-            } else {
-                //this.doNotMove = true
-
-                if (!this.fallingBlock.areTopJewelsTheSame()){
-                    this.fallingBlock.rotate(this.sfx)
-                }
-            }
-
-            // final check
+            //let topCell = this.board.getTopCell(this.fallingBlock.col)
             let bottom1 = this.fallingBlock.getBottomJewel()
             let bottom2 = this.fallingBlock.getMediumJewel()
 
             if (this.board.canClear(bottom1, bottom2, this.fallingBlock.col)){
                 this.doNotMove = true
+            } else {
+                if (this.board.isColumnEmpty(this.fallingBlock.col)){
+                    if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
+                        this.fallingBlock.rotate(this.sfx)
+                    }
+                } else {
+                    this.fallingBlock.rotate(this.sfx)
+                }
             }
         }
 
-        super.loop()
+        //super.loop()
     }
 }
