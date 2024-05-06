@@ -4,7 +4,7 @@ import CpuPlayer from "./player/cpuPlayer.js";
 import ManualPlayer from "./player/manualPlayer.js";
 import SFX from "./sfx.js";
 
-const STAGE = 5
+const STAGE = 4
 
 function playMusic(name: string, initialSecs = 0) {
     const bgm = new Audio(`bgm/${name}.bgm`);
@@ -21,12 +21,13 @@ function playMusic(name: string, initialSecs = 0) {
 
 setTimeout(() => {
     //playMusic('track19')
+    sfx.playBgm()
 }, 3000);
 
 
 let imgJewels: HTMLImageElement[] = Array(6)
 for (let i=0; i<imgJewels.length; i++) 
-    imgJewels[i] = document.getElementById(`st${STAGE}-${i+1}`) as HTMLImageElement
+    imgJewels[i] = document.getElementById(`st${STAGE < 4 ? 1 : STAGE}-${i+1}`) as HTMLImageElement
 
 imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
 

@@ -25,8 +25,28 @@ export default class SFX {
         this.playSound("arrow")
     }
 
+    playBreak(){
+        this.playSound("break1")
+    }
+
+    playNormalPush(){
+        this.playSound(`st${this.stage}-push`)
+    }
+
     playBigPush(){
         this.playSound("big-push")
+    }
+
+    playBgm(){
+        const bgm = new Audio(`bgm/st-0${this.stage}.bgm`);
+        bgm.play();
+
+        let interv = window.setInterval(() => {
+            if (bgm.currentTime > bgm.duration - 1){
+                this.playBgm()
+                clearInterval(interv)
+            }
+        }, 1000)
     }
 
     private playDelayed(name: string, delayMs: number){

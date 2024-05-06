@@ -7,6 +7,7 @@ type Position = [number, number]
 export default class Board {
     matrix: Cell[][]
     toClear: Position[] = []
+    currentClearCount = 0
     rowCount: number
     colCount: number
 
@@ -43,6 +44,7 @@ export default class Board {
     clearPending() {
         this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
         this.toClear = []
+        this.currentClearCount = 0
         this.applyGravityEverywhere()
     }
 
@@ -192,24 +194,32 @@ export default class Board {
         for (let i=0; i<count; i++){
             this.toClear.push([topRow+i, col])
         }
+
+        this.currentClearCount += (count - 2)
     }
 
     clearRow(row: number, firstCol: number, count: number){
         for (let c=firstCol; c<firstCol+count; c++){
             this.toClear.push([row, c])
         }
+
+        this.currentClearCount += (count - 2)
     }
 
     clearDescendingDiagonal(rowStart: number, colStart: number, count: number){
         for (let i=0; i<count; i++){
             this.toClear.push([rowStart+i, colStart+i])
         }
+
+        this.currentClearCount += (count - 2)
     }
 
     clearAscendingDiagonal(rowStart: number, colStart: number, count: number){
         for (let i=0; i<count; i++){
             this.toClear.push([rowStart-i, colStart+i])
         }
+
+        this.currentClearCount += (count - 2)
     }
 
     applyGravityEverywhere(){
@@ -255,6 +265,19 @@ export default class Board {
 
     // ---- CPU STRATEGIES ----------------
 
+    getColumnHeight(col: number): number {
+        let h = 0;
+        let r = this.rowCount-1;
+
+        // count occupied cells
+        while (r >=0 && this.matrix[r][col]){
+            r--
+            h++
+        }
+
+        return h
+    }
+
     getTopCell(col: number) : Cell {
         let res = null
         let r = 0
@@ -265,6 +288,31 @@ export default class Board {
         }
 
         return res
+    }
+
+    canClear(bottom1: Jewel, bottom2: Jewel, col: number): boolean {
+        let r = 0
+
+        while (r < this.rowCount && this.matrix[r][col] === null) r++
+
+        if (r === this.rowCount - 1){
+            let top = this.matrix[r][col]!
+            return (bottom2.color === bottom1.color && bottom1.color === top.color)
+        } else if ((r+1) < this.rowCount){
+            let top1 = this.matrix[r][col]!
+            let top2 = this.matrix[r+1][col]!
+
+            if (bottom1.color === top1.color){
+                if (top1.color === top2.color) return true
+                else return (bottom2.color === bottom1.color)
+            } else {
+                return false
+            }
+
+            // return (jewel.color === top1.color && top1.color === top2.color)
+        }
+
+        return false
     }
 
     // ---- EFFECTS ----------------------

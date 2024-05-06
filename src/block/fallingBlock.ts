@@ -39,7 +39,21 @@ export default class FallingBlock extends Block {
 
     // ---- CPU STRATEGIES ----------
 
+    getMediumJewel() : Jewel {
+        return this.jewels[1]
+    }
+
     getBottomJewel() : Jewel {
         return this.jewels[2]
+    }
+
+    areTopJewelsTheSame(): boolean {
+        return this.jewels[0].equals(this.jewels[1])
+    }
+
+    getUniqueColorCount(): number {
+        let colors = new Set<number>
+        this.jewels.forEach(j => colors.add(j.color))
+        return colors.size
     }
 }

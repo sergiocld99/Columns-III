@@ -102,9 +102,10 @@ export default class Player {
             } else {
                 this.status = MatchStatus.FALLING_BLOCK
 
-                if (this.multiplier < 7 && this.blueScore >= 10) {
-                    this.poisonOpponent()
-                    this.opponent?.nextFallingBlock()
+                // push
+                if (this.multiplier >= 7 && this.shouldPush()){
+                // if (this.multiplier < 7 && this.blueScore >= 10) {
+                    setTimeout(() => this.poisonOpponent(), 250)
                 }
 
                 // arrow generation
@@ -122,7 +123,7 @@ export default class Player {
     }
 
     private stepGravity() {
-        let clears = Math.floor(this.board.toClear.length / 3) + (this.board.toClear.length % 3)
+        let clears = this.board.currentClearCount
         this.updateBlueScore(clears * this.multiplier * (Math.floor(this.blueScore / 30) + 1))
 
         this.board.clearPending()
@@ -136,18 +137,23 @@ export default class Player {
 
     // ---- EFFECTS -----------------------------
 
-    poisonOpponent() {
+    private shouldPush(): boolean {
+        if (this.blueScore < 10) return false
+        return this.blueScore >= 30 || this.blueScore % 10 < 3
+    }
+
+    private poisonOpponent() {
         if (!this.opponent) return
 
-        let count = Math.floor(this.blueScore / 10)
-        let targetIndex = (this.opponent.fallingBlock.col + 3) % this.board.colCount
-
-        if (count >= 3) this.sfx.playBigPush()
-
-        for (let i = 0; i < count; i++) {
-            let added = this.opponent.board.poisonColumn(targetIndex)
-            if (added) this.updateBlueScore(-added * 10)
+        // break falling block
+        if (this.opponent.status === MatchStatus.FALLING_BLOCK){
+            this.opponent.nextFallingBlock()
+            this.sfx.playBreak()
         }
+
+        let count = Math.floor(this.blueScore / 10)
+        if (count >= 3) this.sfx.playBigPush()
+        else this.sfx.playNormalPush()
 
         // random
         let attemptsLeft = 100
