@@ -10,7 +10,7 @@ export default class CpuPlayer extends Player {
     targetCol = 0
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
-        super(document, preffix, sfx, blockGenerator)
+        super(document, preffix, sfx, blockGenerator, true)
     }
 
     reset(): void {
@@ -26,10 +26,14 @@ export default class CpuPlayer extends Player {
         // is player in risk?
         if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
             this.targetCol = 5
+            this.speed = 0.10
             return
         } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
             this.targetCol = 0
+            this.speed = 0.10
             return
+        } else {
+            this.speed = 0.20
         }
 
         // build column candidates

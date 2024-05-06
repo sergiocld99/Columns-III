@@ -10,6 +10,7 @@ export default class Player {
     nextBlock: NextBlock
     fallingBlock: FallingBlock
     board: Board
+    autoPush: boolean
 
     // references
     opponent: Player | null = null
@@ -36,13 +37,15 @@ export default class Player {
     multiplier = 3
     lastArrowCount = 0
     currentBlockIndex = 0
+    speed = 0.20
 
-    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator) {
+    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator, autoPush: boolean) {
         this.fallingBlock = new FallingBlock(blockGenerator.getCopy(this.currentBlockIndex))
         this.nextBlock = blockGenerator.getCopy(++this.currentBlockIndex)
         this.board = new Board(13, 6)
         this.sfx = sfx
         this.blockGenerator = blockGenerator
+        this.autoPush = autoPush
 
         // HTML references
         this.statsEl = document.getElementById(`${preffix}_stats`) as HTMLDivElement
@@ -72,10 +75,10 @@ export default class Player {
     }
 
     protected stepFalling() {
-        this.fallingBlock.row += 0.25
+        this.fallingBlock.row += this.speed
 
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
-            this.fallingBlock.row -= 0.25
+            this.fallingBlock.row -= this.speed
 
             let success = this.board.placeBlock(this.fallingBlock)
 
@@ -103,7 +106,7 @@ export default class Player {
                 // push
                 if (this.multiplier >= 7 && this.shouldPush()){
                 // if (this.multiplier < 7 && this.blueScore >= 10) {
-                    setTimeout(() => this.poisonOpponent(), 250)
+                    setTimeout(() => this.pushOpponent(), 250)
                 }
 
                 // arrow generation
@@ -138,11 +141,11 @@ export default class Player {
 
     private shouldPush(): boolean {
         if (this.blueScore < 10) return false
-        return this.blueScore >= 30 || this.blueScore % 10 < 3
+        return this.blueScore >= 30 || (this.autoPush && this.blueScore % 10 < 3)
     }
 
-    private poisonOpponent() {
-        if (!this.opponent) return
+    protected pushOpponent() {
+        if (!this.opponent || this.blueScore < 10 || this.status != MatchStatus.FALLING_BLOCK) return
 
         // break falling block
         if (this.opponent.status === MatchStatus.FALLING_BLOCK){
@@ -203,14 +206,21 @@ export default class Player {
         this.blueEl.innerHTML = this.blueScore.toString()
         this.whiteEl.innerHTML = this.clearCount.toString()
         this.status = MatchStatus.FALLING_BLOCK
+        this.currentBlockIndex = 0
+        this.nextBlock = this.blockGenerator.getCopy(this.currentBlockIndex)
+        this.nextFallingBlock()
         this.timesInState = 0
         this.ticks = 0
 
-        this.opponent?.reset()
+        if (this.opponent && this.opponent.status != MatchStatus.FALLING_BLOCK){
+            this.opponent?.reset()
+        }
     }
 
     pause(){
         this.status = MatchStatus.PAUSE
-        this.opponent?.pause()
+        if (this.opponent && this.opponent.status != MatchStatus.PAUSE){
+            this.opponent.pause()
+        }
     }
 }

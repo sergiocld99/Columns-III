@@ -6,13 +6,14 @@ import Player from "./player.js";
 export default class ManualPlayer extends Player {
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
-        super(document, preffix, sfx, blockGenerator)
+        super(document, preffix, sfx, blockGenerator, false)
 
         // KEY LISTENER
         document.addEventListener("keydown", e => {
             if (e.key === "ArrowLeft") this.fallingBlock.moveLeft(this.board)
             else if (e.key === "ArrowRight") this.fallingBlock.moveRight(this.board)
             else if (e.key === " ") this.fallingBlock.rotate(sfx)
+            else if (e.key === 'z' || e.key === 'Z') this.pushOpponent()
             else console.log(e.key)
         })
     }

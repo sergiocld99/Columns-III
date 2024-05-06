@@ -29,7 +29,7 @@ export default class Board {
     }
 
     placeBlock(block: Block): boolean {
-        let r = Math.floor(block.row)
+        let r = Math.round(block.row)
         
         for (let i=0; i<3; i++){
             if (r+i < 0) return false
@@ -315,7 +315,7 @@ export default class Board {
 
         // check bottom row
         if (r-2 >= 0){
-            if (col > 2){
+            if (col >= 2){
                 let left1 = this.matrix[r-1][col-1]
                 let left2 = this.matrix[r-1][col-2]
                 let left3 = this.matrix[r-2][col-1]
@@ -330,7 +330,7 @@ export default class Board {
                 }
             }
 
-            if (col < 4){
+            if (col <= this.colCount-3){
                 let right1 = this.matrix[r-1][col+1]
                 let right2 = this.matrix[r-1][col+2]
                 let right3 = this.matrix[r-2][col+1]

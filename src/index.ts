@@ -5,7 +5,7 @@ import ManualPlayer from "./player/manualPlayer.js";
 import SFX from "./sfx.js";
 import { randInt } from "./utils.js";
 
-const STAGE = randInt(5) + 1
+const STAGE = randInt(3) + 3
 
 setTimeout(() => {
     sfx.playBgm()
@@ -23,7 +23,7 @@ const sfx = new SFX(STAGE)
 const blockGenerator = new BlockGenerator([0, 3, 4, 5])
 
 // SETUP FOR PLAYER 1
-let player1 = new CpuPlayer(document, "left", sfx, blockGenerator)
+let player1 = new ManualPlayer(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
@@ -47,3 +47,11 @@ setInterval(() => {
     player2.drawNextBlock(imgJewels)
     player2.drawBoard(imgJewels)
 }, 20)
+
+document.addEventListener("keydown", e => {
+    if (e.key === "Enter"){
+        if (player1.status === MatchStatus.PAUSE){
+            player1.reset()
+        }
+    }
+})
