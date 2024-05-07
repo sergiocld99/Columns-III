@@ -19,6 +19,23 @@
             font-weight: bold;
         }
 
+        .medium-container {
+            height: calc(13*50px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stats-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .enemy-box {
+            margin-top: 100px;
+        }
+
         .board {
             border: 3px solid white;
             margin-bottom: 15px;
@@ -29,7 +46,7 @@
         }
 
         .player-stats {
-            height: calc(13*50px);
+            height: calc(7*50px);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -56,22 +73,37 @@
         img {
             display: none;
         }
+
+        .enemy-img {
+            width: 150px;
+            height: 150px;
+        }
     </style>
 </head>
 <body>
     <!-- DO NOT SPECIFY CANVAS WIDTH AND HEIGHT INSIDE STYLE TAG -->
     <canvas class="board player-board" id="left_board" width="300px" height="650px"></canvas>
-    <div class="player-stats" id="left_stats">
-        <canvas class="board next-board" width="50px" height="150px"></canvas>
-        <p class="board blue-score">0</p>
-        <p class="board white-score">0</p>
+
+    <div class="medium-container">
+        <div class="stats-container">
+            <div class="player-stats" id="left_stats">
+                <canvas class="board next-board" width="50px" height="150px"></canvas>
+                <p class="board blue-score">0</p>
+                <p class="board white-score">0</p>
+            </div>
+            <span style="min-width: 40px;"></span>
+            <div class="player-stats" id="right_stats">
+                <canvas class="board next-board" width="50px" height="150px"></canvas>
+                <p class="board blue-score">0</p>
+                <p class="board white-score">0</p>
+            </div>
+        </div>
+
+        <canvas class="enemy-box board" width="150px" height="150px"></canvas>
+            
+        </div>
     </div>
-    <span style="min-width: 40px;"></span>
-    <div class="player-stats" id="right_stats">
-        <canvas class="board next-board" width="50px" height="150px"></canvas>
-        <p class="board blue-score">0</p>
-        <p class="board white-score">0</p>
-    </div>
+    
     <canvas class="board player-board" id="right_board" width="300px" height="650px"></canvas>
 
     <!-- Hidden Images -->
@@ -96,9 +128,12 @@
     <img src="jewels/st5-4.png" id="st5-4">
     <img src="jewels/st5-5.png" id="st5-5">
     <img src="jewels/st5-6.png" id="st5-6">
-
-
     <img src="jewels/mysterious.png" id="mysterious">
+
+    <!-- Characters -->
+    <img src="gfx/sphinx-1.png" id="sphinx-1">
+    <img src="gfx/sphinx-2.png" id="sphinx-2">
+    <img src="gfx/sphinx-3.png" id="sphinx-3">
 
     <script src="index.js" type="module"></script>
 </body>

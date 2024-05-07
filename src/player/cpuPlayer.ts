@@ -152,6 +152,11 @@ export default abstract class CpuPlayer extends Player {
         this.speed = 0.10
     }
 
+    protected pushOpponent(): void {
+        if (this.blueScore >= 20) this.inRisk = false
+        super.pushOpponent()
+    }
+
     protected abstract manageMagicStone(topCell: Jewel | null): MagicStoneJewels
     protected abstract getMinRowForSpeeding(): number
     protected abstract getName(): string

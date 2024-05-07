@@ -84,7 +84,7 @@ export default class SFX {
 
         this.fadingInterv = window.setInterval(() => {
             if (this.bgm && this.bgm.volume > 0){
-                this.bgm.volume -= 0.1
+                this.bgm.volume = Math.max(this.bgm.volume - 0.1, 0)
             } else {
                 this.bgm?.pause()
                 this.bgm = null

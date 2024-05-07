@@ -25,6 +25,12 @@ function loadImgJewels(stage: number) {
     }
 }
 
+// Player 2 GFX
+const characterCanvas = document.getElementsByClassName("enemy-box")[0] as HTMLCanvasElement
+const characterCtx = characterCanvas.getContext("2d")!
+const sphinxImgs = Array(3)
+for (let i=0; i<sphinxImgs.length; i++) 
+    sphinxImgs[i] = document.getElementById(`sphinx-${i+1}`) as HTMLImageElement
 
 // COMMON SETUP
 const sfx = new SFX(randInt(5)+1)
@@ -63,6 +69,22 @@ setInterval(() => {
     player2.drawNextBlock(imgJewels)
     player2.drawBoard(imgJewels)
 }, 20)
+
+let characterTick = 0
+
+setInterval(() => {
+    characterCtx.clearRect(0,0,characterCanvas.width, characterCanvas.height)
+    characterTick = (characterTick+1) % 2
+    let resource: HTMLImageElement
+
+    if (player2.inRisk){
+        resource = characterTick ? sphinxImgs[1] : sphinxImgs[0]
+    } else {
+        resource = player1.inRisk ? sphinxImgs[2] : sphinxImgs[0]
+    }
+
+    characterCtx.drawImage(resource, 0, 0, 231, 231, 0, 0, 150, 150)
+}, 250)
 
 document.addEventListener("keydown", e => {
     if (e.key === "Enter"){

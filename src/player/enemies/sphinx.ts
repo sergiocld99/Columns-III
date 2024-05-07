@@ -23,7 +23,7 @@ export default class Sphinx extends CpuPlayer {
     }
 
     protected manageMagicStone(topCell: Jewel | null): MagicStoneJewels {
-        if (this.board.getColumnHeight(this.fallingBlock.col) <= 4){
+        if (this.board.getColumnHeight(this.fallingBlock.col) <= 4 || this.opponent?.inRisk){
             return MagicStoneJewels.PUSH_UP
         } else if (topCell?.mysterious){
             return MagicStoneJewels.PUSH_DOWN

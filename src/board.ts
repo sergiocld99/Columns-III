@@ -283,10 +283,10 @@ export default class Board {
     // ---- CPU STRATEGIES ----------------
 
     getLowestColumn(): number {
-        let minHeight = this.getColumnHeight(0)
+        let minHeight = this.getColumnHeight(2) + 2
         let currHeight: number
-        let bestCol = 0
-        let candidates = [0,1,3,4,5,2]
+        let bestCol = 2
+        let candidates = [0,1,3,4,5]
 
         candidates.forEach(c => {
             currHeight = this.getColumnHeight(c)
