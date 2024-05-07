@@ -32,12 +32,26 @@ export default class Board {
 
     placeBlock(block: FallingBlock): boolean {
         let r = Math.round(block.row)
-        
-        // from bottom to top
-        for (let i=2; i>=0; i--){
-            if (r+i < 0) return false
-            this.matrix[r+i][block.col] = block.jewels[i]
+
+        if (block.isMagicStone()){
+            for (let i=2; i>=0; i--){
+                if (r+i >= 0){
+                    this.matrix[r+i][block.col] = block.jewels[i]
+                    block.jewels[i].clearing = true
+                    this.toClear.push([r+i, block.col])
+                } else if (i === 2){
+                    // no block was placed
+                    return false
+                }
+            }
+        } else {
+            // from bottom to top
+            for (let i=2; i>=0; i--){
+                if (r+i < 0) return false
+                this.matrix[r+i][block.col] = block.jewels[i]
+            }
         }
+        
 
         return true
     }
@@ -62,7 +76,7 @@ export default class Board {
         for (let r=1; r<this.rowCount; r++) this.checkDescendingDiagonal(r,0)
         for (let r=this.rowCount-2; r>=0; r--) this.checkAscendingDiagonal(r,0)
 
-        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]]!.clearing = true)
+        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]]?.setClearing())
         return this.toClear.length > 0
     }
 
@@ -268,6 +282,22 @@ export default class Board {
 
     // ---- CPU STRATEGIES ----------------
 
+    getLowestColumn(): number {
+        let minHeight = this.getColumnHeight(0)
+        let currHeight: number
+        let bestCol = 0
+
+        for (let c=1; c<this.colCount; c++){
+            currHeight = this.getColumnHeight(c)
+            if (currHeight < minHeight){
+                minHeight = currHeight
+                bestCol = c
+            }
+        }
+
+        return bestCol
+    }
+
     getColumnHeight(col: number): number {
         let h = 0;
         let r = this.rowCount-1;
@@ -315,9 +345,20 @@ export default class Board {
         return res
     }
 
-    canClear(bottom1: Jewel, bottom2: Jewel, topJw: Jewel, col: number): ClearPredict | null {
-        if (col === 2 && this.matrix[3][2]) return null
-        if (this.willClear(bottom1, bottom2, topJw)) return ClearPredict.COLUMN
+    canClear(fallingBlock: FallingBlock): ClearPredict | null {
+        if (fallingBlock.col === 2){
+            if (this.matrix[2][2]){
+                console.log("Avoiding immediate lose at column 2...")
+                return null
+            }
+        }
+
+        if (fallingBlock.colorCount === 1) return ClearPredict.COLUMN
+
+        const bottom1 = fallingBlock.getBottomJewel()
+        const bottom2 = fallingBlock.getMediumJewel()
+        const topJw = fallingBlock.jewels[0]
+        const col = fallingBlock.col
         let r = 0
 
         while (r < this.rowCount && this.matrix[r][col] === null) r++

@@ -13,6 +13,7 @@ export default abstract class Player {
     board: Board
     autoPush: boolean
     maxSpeed = 0.5
+    inRisk = false
 
     // references
     opponent: Player | null = null
@@ -169,6 +170,10 @@ export default abstract class Player {
 
     public breakFallingBlock(): void {
         if (this.status === PlayerStatus.FALLING_BLOCK){
+            if (this.fallingBlock.isMagicStone()){
+                console.log("Magic Stone broken")
+            }
+
             this.nextFallingBlock()
             this.sfx.playBreak()
         }
@@ -182,9 +187,13 @@ export default abstract class Player {
         this.sfx.playNormalPush()
 
         // add one mysterious jewel in each column
+        let added = 0
+
         for (let c=0; c<this.board.colCount; c++){
-            this.opponent.board.poisonColumn(c)
+            added += this.opponent.board.poisonColumn(c)
         }
+
+        console.log(`Push effectivity: ${(added*100/6).toFixed(0)}%`)
     }
 
     protected pushOpponent() {

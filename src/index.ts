@@ -6,6 +6,7 @@ import SFX from "./sfx.js";
 import { randInt } from "./utils.js";
 import Match from "./match/match.js";
 import Sphinx from "./player/enemies/sphinx.js";
+import Mommy from "./player/enemies/mommy.js";
 
 const STAGE = randInt(5) + 1
 
@@ -25,7 +26,7 @@ const sfx = new SFX(STAGE)
 const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 
 // SETUP FOR PLAYER 1
-let player1 = new Sphinx(document, "left", sfx, blockGenerator)
+let player1 = new Mommy(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
@@ -56,6 +57,7 @@ setInterval(() => {
 document.addEventListener("keydown", e => {
     if (e.key === "Enter"){
         if (player1.status === PlayerStatus.PAUSE){
+            blockGenerator.reset()
             player1.reset()
         }
     }

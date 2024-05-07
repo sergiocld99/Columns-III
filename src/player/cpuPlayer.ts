@@ -10,7 +10,6 @@ export default abstract class CpuPlayer extends Player {
     doNotMove = false
     targetCol = 0
     timesRotated = 0
-    inRisk = false
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
         super(document, preffix, sfx, blockGenerator, true)
@@ -29,6 +28,7 @@ export default abstract class CpuPlayer extends Player {
         this.doNotMove = false
         this.speed = 0.10
         this.timesRotated = 0
+        this.targetCol = -1
 
         // is player in risk?
         if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
@@ -55,7 +55,7 @@ export default abstract class CpuPlayer extends Player {
             
             for (let c=0; c<this.board.colCount; c++){
                 topCell = this.board.getTopCell(c)
-                if (topCell && topCell.color === targetColor){
+                if (topCell && topCell.color === targetColor && this.board.matrix[2][c] === null){
                     this.targetCol = c
                     return
                 }
@@ -73,64 +73,80 @@ export default abstract class CpuPlayer extends Player {
 
         candidates.forEach(col => {
             currentHeight = this.board.getPonderedColumnHeight(col)
-            if (currentHeight === 0 && this.fallingBlock.colorCount < 3){
-                this.targetCol = col
-                return
-            }
 
-            if (currentHeight < minHeight){
+            if (currentHeight < minHeight && this.board.matrix[2][col] === null){
                 minHeight = currentHeight
                 this.targetCol = col
                 //this.targetCol = col < 2 ? 5 : 0
             }
         })  
+
+        // still no luck...
+        if (this.targetCol === -1){
+            this.targetCol = this.board.getLowestColumn()
+        }
     }
 
     stepFalling(){
         super.stepFalling()
         this.auxTicks++
 
-        if (this.auxTicks >= 7 && this.fallingBlock.row > -1 && !this.doNotMove){
+        if (this.auxTicks >= 7 && this.fallingBlock.row > -2 && !this.doNotMove){
             this.auxTicks = 0
 
             let currentCol = this.fallingBlock.col
 
             if (currentCol > this.targetCol) {
-                this.fallingBlock.moveLeft(this.board)
-                this.timesRotated = 0
+                if (currentCol != 1 || this.board.matrix[2][0] === null){
+                    this.fallingBlock.moveLeft(this.board)
+                    this.timesRotated = 0
+                }
             } else if (currentCol < this.targetCol) {
-                this.fallingBlock.moveRight(this.board)
-                this.timesRotated = 0
+                if (currentCol === 3 && this.board.matrix[2][4]){
+                    console.log("Movement to column 4 avoided...")
+                } else {
+                    this.fallingBlock.moveRight(this.board)
+                    this.timesRotated = 0
+                    
+                }
+
             }
         }
 
         if (this.auxTicks % 5 === 0){
             let topCell = this.board.getTopCell(this.fallingBlock.col)
-            let bottom1 = this.fallingBlock.getBottomJewel()
-            let bottom2 = this.fallingBlock.getMediumJewel()
-            let fallingTop = this.fallingBlock.jewels[0]
 
             if (this.fallingBlock.isMagicStone()){
-                this.speed = this.maxSpeed
-                this.manageMagicStone(topCell)
-            } else if (this.board.canClear(bottom1, bottom2, fallingTop, this.fallingBlock.col)){
+                if (topCell && !topCell.mysterious) this.doNotMove = true
+                this.speedUp()
+                this.manageMagicStone()
+            } else if (this.board.canClear(this.fallingBlock)){
                 this.doNotMove = true
-                this.speed = this.maxSpeed
+                this.speedUp()
             } else {
                 this.doNotMove = false
-
-                if (this.board.isColumnEmpty(this.fallingBlock.col)){
-                    this.speed = this.maxSpeed
-
-                    if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
-                        this.fallingBlock.rotate(this.sfx)
-                    }
-                } else if (++this.timesRotated < 4) {
+                if (this.board.isColumnEmpty(this.fallingBlock.col)) this.speedUp()
+                else this.slowDown()
+                
+                if (++this.timesRotated < 4) {
+                    this.fallingBlock.rotate(this.sfx)
+                } else if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
                     this.fallingBlock.rotate(this.sfx)
                 }
             }
         }
     }
 
-    protected abstract manageMagicStone(topCell: Jewel | null): void
+    private speedUp(){
+        if (this.fallingBlock.row > this.getMinRowForSpeeding()){
+            this.speed = this.maxSpeed
+        }
+    }
+
+    private slowDown(){
+        this.speed = 0.10
+    }
+
+    protected abstract manageMagicStone(): void
+    protected abstract getMinRowForSpeeding(): number
 }

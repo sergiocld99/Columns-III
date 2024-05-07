@@ -3,21 +3,16 @@ import { Jewel } from "../../jewel.js";
 import SFX from "../../sfx.js";
 import CpuPlayer from "../cpuPlayer.js";
 
-export default class Sphinx extends CpuPlayer {
+export default class Mommy extends CpuPlayer {
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
         super(document, preffix, sfx, blockGenerator)
+        this.maxSpeed -= 0.1
     }
 
     protected shouldPush(): boolean {
         if (this.blueScore < 10) return false
-
-        if (this.inRisk || this.opponent?.inRisk || 
-            this.opponent?.fallingBlock.isMagicStone() || 
-            this.opponent?.fallingBlock.colorCount === 1){
-                return true
-        }
-
+        if (this.inRisk) return true
         return this.blueScore >= 20
     }
 
@@ -37,6 +32,6 @@ export default class Sphinx extends CpuPlayer {
     }
 
     protected getMinRowForSpeeding(): number {
-        return -3
+        return -1
     }
 }

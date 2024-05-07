@@ -11,13 +11,12 @@ export class Jewel {
         this.color = color
     }
 
-    equals(other: Jewel) : boolean {
-        if (other){
-            if (other.color === this.color) return true
-            if (other.isMagicStoneType() && this.isMagicStoneType()) return true
-        }
+    setClearing(){
+        this.clearing = true
+    }
 
-        return false
+    equals(other: Jewel) : boolean {
+        return other && other.color === this.color
     }
 
     isMagicStoneType(){
