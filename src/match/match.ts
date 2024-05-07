@@ -21,6 +21,9 @@ export default class Match {
     play(){
         this.status = MatchStatus.PLAYING
         this.sfx.playBgm()
-        this.players.forEach(p => p.status = PlayerStatus.FALLING_BLOCK)
+        this.players.forEach(p => {
+            p.status = PlayerStatus.FALLING_BLOCK
+            p.nextFallingBlock()
+        })
     }
 }

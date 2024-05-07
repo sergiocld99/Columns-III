@@ -33,4 +33,8 @@ export default class ManualPlayer extends Player {
             this.speed = 0.1
         }
     }
+
+    protected shouldPush(): boolean {
+        return this.blueScore >= 30
+    }
 }

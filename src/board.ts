@@ -316,7 +316,7 @@ export default class Board {
     }
 
     canClear(bottom1: Jewel, bottom2: Jewel, topJw: Jewel, col: number): ClearPredict | null {
-        if (col === 2 && this.matrix[4][2]) return null
+        if (col === 2 && this.matrix[3][2]) return null
         if (this.willClear(bottom1, bottom2, topJw)) return ClearPredict.COLUMN
         let r = 0
 

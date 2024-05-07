@@ -5,6 +5,7 @@ import ManualPlayer from "./player/manualPlayer.js";
 import SFX from "./sfx.js";
 import { randInt } from "./utils.js";
 import Match from "./match/match.js";
+import Sphinx from "./player/enemies/sphinx.js";
 
 const STAGE = randInt(5) + 1
 
@@ -24,11 +25,11 @@ const sfx = new SFX(STAGE)
 const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 
 // SETUP FOR PLAYER 1
-let player1 = new ManualPlayer(document, "left", sfx, blockGenerator)
+let player1 = new Sphinx(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
-let player2 = new CpuPlayer(document, "right", sfx, blockGenerator)
+let player2 = new Sphinx(document, "right", sfx, blockGenerator)
 player2.drawNextBlock(imgJewels)
 
 // SET OPPONENTS
@@ -42,7 +43,7 @@ setTimeout(() => match.start(), 1000)
 setInterval(() => {
     player1.loop()
     player2.loop()
-}, 50)
+}, 30)
 
 setInterval(() => {
     player1.drawNextBlock(imgJewels)

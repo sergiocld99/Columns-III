@@ -1,16 +1,16 @@
 import BlockGenerator from "../block/blockGenerator.js";
 import { ClearPredict } from "../clearPredict.js";
-import { COLOR_VARIANTS_COUNT } from "../jewel.js";
+import { COLOR_VARIANTS_COUNT, Jewel } from "../jewel.js";
 import SFX from "../sfx.js";
 import { randInt } from "../utils.js";
 import Player from "./player.js";
 
-export default class CpuPlayer extends Player {
+export default abstract class CpuPlayer extends Player {
     auxTicks = 0
     doNotMove = false
     targetCol = 0
-    maxSpeed = 0.5
     timesRotated = 0
+    inRisk = false
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
         super(document, preffix, sfx, blockGenerator, true)
@@ -33,11 +33,15 @@ export default class CpuPlayer extends Player {
         // is player in risk?
         if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
             this.targetCol = 5
+            this.inRisk = true
             return
         } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
             this.targetCol = 0
+            this.inRisk = true
             return
-        } 
+        } else {
+            this.inRisk = false
+        }
         
         // quick search
         if (this.fallingBlock.colorCount < 3){
@@ -108,17 +112,7 @@ export default class CpuPlayer extends Player {
 
             if (this.fallingBlock.isMagicStone()){
                 this.speed = this.maxSpeed
-
-                if (topCell?.mysterious){
-                    if (!this.fallingBlock.getBottomJewel().isPushDownType())
-                        this.fallingBlock.rotate(this.sfx)
-                } else if (!topCell){
-                    if (!this.fallingBlock.getBottomJewel().isPushUpType()) 
-                        this.fallingBlock.rotate(this.sfx)
-                } else {
-                    if (!this.fallingBlock.getBottomJewel().isClearType())
-                        this.fallingBlock.rotate(this.sfx)
-                }
+                this.manageMagicStone(topCell)
             } else if (this.board.canClear(bottom1, bottom2, fallingTop, this.fallingBlock.col)){
                 this.doNotMove = true
                 this.speed = this.maxSpeed
@@ -136,7 +130,7 @@ export default class CpuPlayer extends Player {
                 }
             }
         }
-
-        //super.loop()
     }
+
+    protected abstract manageMagicStone(topCell: Jewel | null): void
 }

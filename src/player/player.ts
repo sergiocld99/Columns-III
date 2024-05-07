@@ -7,11 +7,12 @@ import SFX from "../sfx.js";
 import BlockGenerator from "../block/blockGenerator.js";
 import MagicStone from "../block/magicStone.js";
 
-export default class Player {
+export default abstract class Player {
     nextBlock: NextBlock
     fallingBlock: FallingBlock
     board: Board
     autoPush: boolean
+    maxSpeed = 0.5
 
     // references
     opponent: Player | null = null
@@ -41,8 +42,9 @@ export default class Player {
     speed = 0.20
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator, autoPush: boolean) {
-        this.fallingBlock = new FallingBlock(blockGenerator.getCopy(this.currentBlockIndex))
-        this.nextBlock = blockGenerator.getCopy(++this.currentBlockIndex)
+        this.nextBlock = blockGenerator.getCopy(this.currentBlockIndex)
+        this.fallingBlock = new FallingBlock(this.nextBlock)
+        //this.nextBlock = blockGenerator.getCopy(++this.currentBlockIndex)
         this.board = new Board(13, 6)
         this.sfx = sfx
         this.blockGenerator = blockGenerator
@@ -114,7 +116,7 @@ export default class Player {
                 this.pause()
             }
 
-            this.nextFallingBlock()
+            //this.nextFallingBlock()
         }
     }
 
@@ -126,10 +128,10 @@ export default class Player {
                 this.sfx.playClear(Math.ceil(this.multiplier / 4))
             } else {
                 this.status = PlayerStatus.FALLING_BLOCK
+                this.nextFallingBlock()
 
                 // push
-                if (this.multiplier >= 7 && this.shouldPush()){
-                // if (this.multiplier < 7 && this.blueScore >= 10) {
+                if (this.shouldPush()){
                     setTimeout(() => this.pushOpponent(), 250)
                 }
 
@@ -142,7 +144,7 @@ export default class Player {
                     this.nextBlock = new MagicStone()
                 }
             }
-        } else if (this.timesInState >= 7) {
+        } else if (this.timesInState >= 15) {
             this.status = PlayerStatus.APPLYING_GRAVITY
         }
 
@@ -172,10 +174,7 @@ export default class Player {
         }
     }
 
-    private shouldPush(): boolean {
-        if (this.blueScore < 10) return false
-        return this.blueScore >= 30 || (this.autoPush && this.blueScore % 10 < 3)
-    }
+    protected abstract shouldPush(): boolean
 
     private pushOpponentUsingArrow(){
         if (!this.opponent) return
@@ -221,7 +220,9 @@ export default class Player {
 
         this.boardCtx.clearRect(0, 0, this.boardEl.width, this.boardEl.height)
         this.board.draw(imgJewels, this.boardCtx, this.ticks)
-        this.fallingBlock.draw(imgJewels, this.boardCtx)
+
+        if (this.status === PlayerStatus.FALLING_BLOCK)
+            this.fallingBlock.draw(imgJewels, this.boardCtx)
     }
 
     updateBlueScore(diff: number) {
