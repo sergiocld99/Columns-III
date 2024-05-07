@@ -91,6 +91,11 @@ export default class SFX {
         }, 500)
     }
 
+    nextStage(){
+        if (this.stage === 5) this.stage = 1
+        else this.stage++
+    }
+
     private playDelayed(name: string, delayMs: number){
         setTimeout(() => this.playSound(name), delayMs)
     }

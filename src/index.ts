@@ -8,22 +8,27 @@ import Match from "./match/match.js";
 import Sphinx from "./player/enemies/sphinx.js";
 import Mommy from "./player/enemies/mommy.js";
 
-const STAGE = randInt(5) + 1
+let imgJewels: HTMLImageElement[] = []
 
-let imgJewels: HTMLImageElement[] = Array(6)
-for (let i=0; i<imgJewels.length; i++) 
-    imgJewels[i] = document.getElementById(`st${STAGE < 4 ? 1 : STAGE}-${i+1}`) as HTMLImageElement
+function loadImgJewels(stage: number) {
+    imgJewels = Array(6)
 
-imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
-
-// magic stone
-for (let i=0; i<3; i++){
-    imgJewels.push(document.getElementById(`ms-${i+1}`) as HTMLImageElement)
+    for (let i=0; i<imgJewels.length; i++) 
+        imgJewels[i] = document.getElementById(`st${stage < 4 ? 1 : stage}-${i+1}`) as HTMLImageElement
+    
+    imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
+    
+    // magic stone
+    for (let i=0; i<3; i++){
+        imgJewels.push(document.getElementById(`ms-${i+1}`) as HTMLImageElement)
+    }
 }
 
+
 // COMMON SETUP
-const sfx = new SFX(STAGE)
+const sfx = new SFX(randInt(5)+1)
 const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
+loadImgJewels(sfx.stage)
 
 // SETUP FOR PLAYER 1
 let player1 = new ManualPlayer(document, "left", sfx, blockGenerator)
@@ -57,6 +62,8 @@ setInterval(() => {
 document.addEventListener("keydown", e => {
     if (e.key === "Enter"){
         if (player1.status === PlayerStatus.PAUSE){
+            sfx.nextStage()
+            loadImgJewels(sfx.stage)
             blockGenerator.reset()
             match.reset()
         }
