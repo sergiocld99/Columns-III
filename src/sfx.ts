@@ -1,4 +1,5 @@
 import Match from "./match/match.js"
+import { MatchStatus } from "./match/matchStatus.js"
 
 export default class SFX {
     stage: number
@@ -60,7 +61,7 @@ export default class SFX {
         })
     }
 
-    playBgm(){
+    playBgm(match: Match){
         this.bgm = new Audio(`bgm/st-0${this.stage}.bgm`);
         this.bgm.play();
 
@@ -68,9 +69,9 @@ export default class SFX {
         else if (this.stage === 4) this.bgm.volume = 0.7
 
         this.bgmInterv = window.setInterval(() => {
-            if (this.bgm){
+            if (this.bgm && match.status === MatchStatus.PLAYING){
                 if (this.bgm.currentTime > this.bgm.duration - 1){
-                    this.playBgm()
+                    this.playBgm(match)
                     if (this.bgmInterv) clearInterval(this.bgmInterv)
                 }
             }

@@ -2,6 +2,7 @@ import BlockGenerator from "../../block/blockGenerator.js";
 import { Jewel, MagicStoneJewels } from "../../jewel.js";
 import SFX from "../../sfx.js";
 import CpuPlayer from "../cpuPlayer.js";
+import PlayerStatus from "../playerStatus.js";
 
 export default class Sphinx extends CpuPlayer {
 
@@ -10,12 +11,12 @@ export default class Sphinx extends CpuPlayer {
     }
 
     protected shouldPush(): boolean {
-        if (this.blueScore < 10) return false
-
-        if (this.inRisk || this.opponent?.inRisk || 
-            this.opponent?.fallingBlock.isMagicStone() || 
-            this.opponent?.fallingBlock.colorCount === 1){
+        if (this.blueScore < 10 || !this.opponent) return false
+        if (this.inRisk || this.opponent.inRisk) return true
+        if (this.opponent.status === PlayerStatus.FALLING_BLOCK){
+            if (this.opponent.fallingBlock.isMagicStone() || this.fallingBlock.colorCount === 1){
                 return true
+            }
         }
 
         return this.blueScore >= 20

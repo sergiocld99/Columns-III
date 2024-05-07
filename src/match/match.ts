@@ -4,7 +4,7 @@ import SFX from "../sfx.js";
 import { MatchStatus } from "./matchStatus.js";
 
 export default class Match {
-    private status: MatchStatus
+    status: MatchStatus
     private sfx: SFX
     private players: Player[]
 
@@ -21,7 +21,7 @@ export default class Match {
 
     play(){
         this.status = MatchStatus.PLAYING
-        this.sfx.playBgm()
+        this.sfx.playBgm(this)
         this.players.forEach(p => {
             p.status = PlayerStatus.FALLING_BLOCK
             p.nextFallingBlock()
