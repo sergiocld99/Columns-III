@@ -24,7 +24,7 @@ const sfx = new SFX(STAGE)
 const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 
 // SETUP FOR PLAYER 1
-let player1 = new CpuPlayer(document, "left", sfx, blockGenerator)
+let player1 = new ManualPlayer(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
