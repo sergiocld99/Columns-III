@@ -1,5 +1,5 @@
 import BlockGenerator from "../../block/blockGenerator.js";
-import { Jewel } from "../../jewel.js";
+import { Jewel, MagicStoneJewels } from "../../jewel.js";
 import SFX from "../../sfx.js";
 import CpuPlayer from "../cpuPlayer.js";
 
@@ -21,22 +21,21 @@ export default class Sphinx extends CpuPlayer {
         return this.blueScore >= 20
     }
 
-    protected manageMagicStone(): void {
+    protected manageMagicStone(topCell: Jewel | null): MagicStoneJewels {
         if (this.board.getColumnHeight(this.fallingBlock.col) <= 4){
-            if (!this.fallingBlock.getBottomJewel().isPushUpType()) 
-                this.fallingBlock.rotate(this.sfx)
-        } else if (this.blueScore < 5){
-            if (!this.fallingBlock.getBottomJewel().isPushDownType())
-                this.fallingBlock.rotate(this.sfx)
-
+            return MagicStoneJewels.PUSH_UP
+        } else if (topCell?.mysterious){
+            return MagicStoneJewels.PUSH_DOWN
         } else {
-            if (!this.fallingBlock.getBottomJewel().isClearType())
-                this.fallingBlock.rotate(this.sfx)
-
+            return MagicStoneJewels.CLEAR
         }
     }
 
     protected getMinRowForSpeeding(): number {
         return -3
+    }
+
+    protected getName(): string {
+        return "Sphinx"
     }
 }

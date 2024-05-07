@@ -1,6 +1,6 @@
 import BlockGenerator from "../block/blockGenerator.js";
 import { ClearPredict } from "../clearPredict.js";
-import { COLOR_VARIANTS_COUNT, Jewel } from "../jewel.js";
+import { COLOR_VARIANTS_COUNT, Jewel, MagicStoneJewels } from "../jewel.js";
 import SFX from "../sfx.js";
 import { randInt } from "../utils.js";
 import Player from "./player.js";
@@ -25,8 +25,8 @@ export default abstract class CpuPlayer extends Player {
 
     nextFallingBlock(): void {
         super.nextFallingBlock()
+        this.slowDown()
         this.doNotMove = false
-        this.speed = 0.10
         this.timesRotated = 0
         this.targetCol = -1
 
@@ -83,7 +83,10 @@ export default abstract class CpuPlayer extends Player {
 
         // still no luck...
         if (this.targetCol === -1){
+            this.inRisk = true
             this.targetCol = this.board.getLowestColumn()
+            console.log(this.getName(), "is about to lose...")
+            setTimeout(() => this.pushOpponent(), 500)
         }
     }
 
@@ -103,7 +106,7 @@ export default abstract class CpuPlayer extends Player {
                 }
             } else if (currentCol < this.targetCol) {
                 if (currentCol === 3 && this.board.matrix[2][4]){
-                    console.log("Movement to column 4 avoided...")
+                    console.log("Column 4 avoided for", this.getName())
                 } else {
                     this.fallingBlock.moveRight(this.board)
                     this.timesRotated = 0
@@ -119,7 +122,8 @@ export default abstract class CpuPlayer extends Player {
             if (this.fallingBlock.isMagicStone()){
                 if (topCell && !topCell.mysterious) this.doNotMove = true
                 this.speedUp()
-                this.manageMagicStone()
+                let target = this.manageMagicStone(topCell)
+                if (this.fallingBlock.getBottomJewel().color != target) this.fallingBlock.rotate(this.sfx)
             } else if (this.board.canClear(this.fallingBlock)){
                 this.doNotMove = true
                 this.speedUp()
@@ -147,6 +151,7 @@ export default abstract class CpuPlayer extends Player {
         this.speed = 0.10
     }
 
-    protected abstract manageMagicStone(): void
+    protected abstract manageMagicStone(topCell: Jewel | null): MagicStoneJewels
     protected abstract getMinRowForSpeeding(): number
+    protected abstract getName(): string
 }

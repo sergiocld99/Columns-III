@@ -286,14 +286,15 @@ export default class Board {
         let minHeight = this.getColumnHeight(0)
         let currHeight: number
         let bestCol = 0
+        let candidates = [0,1,3,4,5,2]
 
-        for (let c=1; c<this.colCount; c++){
+        candidates.forEach(c => {
             currHeight = this.getColumnHeight(c)
             if (currHeight < minHeight){
                 minHeight = currHeight
                 bestCol = c
             }
-        }
+        })
 
         return bestCol
     }
@@ -348,7 +349,7 @@ export default class Board {
     canClear(fallingBlock: FallingBlock): ClearPredict | null {
         if (fallingBlock.col === 2){
             if (this.matrix[2][2]){
-                console.log("Avoiding immediate lose at column 2...")
+                //console.log("Avoiding immediate lose at column 2...")
                 return null
             }
         }
