@@ -1,5 +1,6 @@
 import Block from "./block/block.js";
 import FallingBlock from "./block/fallingBlock.js";
+import { ClearPredict } from "./clearPredict.js";
 import { Jewel } from "./jewel.js";
 
 type Cell = Jewel | null
@@ -280,6 +281,23 @@ export default class Board {
         return h
     }
 
+    getPonderedColumnHeight(col: number): number {
+        let h = this.getColumnHeight(col)
+        
+        switch (col) {
+            case 2:
+                return h + 11
+            case 1:
+            case 3:
+                return h + 7
+            case 0:
+            case 4:
+                return h + 3
+            default:
+                return h
+        }
+    }
+
     isColumnEmpty(col: number): boolean {
         return this.matrix[this.rowCount-1][col] === null
     }
@@ -297,7 +315,8 @@ export default class Board {
         return res
     }
 
-    canClear(bottom1: Jewel, bottom2: Jewel, col: number): boolean {
+    canClear(bottom1: Jewel, bottom2: Jewel, topJw: Jewel, col: number): ClearPredict | null {
+        if (this.willClear(bottom1, bottom2, topJw)) return ClearPredict.COLUMN
         let r = 0
 
         while (r < this.rowCount && this.matrix[r][col] === null) r++
@@ -305,51 +324,73 @@ export default class Board {
         if (r === this.rowCount - 1){
             // column height is 1
             let top = this.matrix[r][col]!
-            if (bottom2.color === bottom1.color && bottom1.color === top.color) return true
+            if (this.willClear(bottom2, bottom1, top)) return ClearPredict.COLUMN
         } else if ((r+1) < this.rowCount){
             // column height is greater than 1
             let top1 = this.matrix[r][col]!
             let top2 = this.matrix[r+1][col]!
 
             if (bottom1.color === top1.color){
-                if (top1.color === top2.color || bottom2.color === bottom1.color) return true
+                if (top1.color === top2.color || bottom2.color === bottom1.color) return ClearPredict.COLUMN
             }
         }
 
         // check bottom row
-        if (r-2 >= 0){
+        if (r-4 >= 0){
             if (col >= 2){
-                let left1 = this.matrix[r-1][col-1]
-                let left2 = this.matrix[r-1][col-2]
-                let left3 = this.matrix[r-2][col-1]
-                let left4 = this.matrix[r-2][col-2]
+                if (this.willClear(this.matrix[r-1][col-2], this.matrix[r-1][col-1], bottom1)) return ClearPredict.ROW
+                if (this.willClear(this.matrix[r-2][col-2], this.matrix[r-2][col-1], bottom2)) return ClearPredict.ROW
+                if (this.willClear(this.matrix[r-3][col-2], this.matrix[r-3][col-1], topJw)) return ClearPredict.ROW
+                
+                // diagonal up (<--)
+                if (this.willClear(this.matrix[r-3][col-2], this.matrix[r-2][col-1], bottom1)) return ClearPredict.DIAGONAL_LEFT
+                if (this.willClear(this.matrix[r-4][col-2], this.matrix[r-3][col-1], bottom2)) return ClearPredict.DIAGONAL_LEFT
 
-                if (left1 && left2){
-                    if (left2.color === left1.color && left1.color === bottom1.color) return true
-                }
-
-                if (left3 && left4){
-                    if (left4.color === left3.color && left3.color === bottom2.color) return true
+                // diagonal down (<--)
+                if (r+1 < this.rowCount){
+                    if (this.willClear(this.matrix[r+1][col-2], this.matrix[r][col-1], bottom1)) return ClearPredict.DIAGONAL_LEFT
+                    if (this.willClear(this.matrix[r][col-2], this.matrix[r-1][col-1], bottom2)) return ClearPredict.DIAGONAL_LEFT
+                    if (this.willClear(this.matrix[r-1][col-2], this.matrix[r-2][col-1], topJw)) return ClearPredict.DIAGONAL_LEFT
                 }
             }
 
             if (col <= this.colCount-3){
-                let right1 = this.matrix[r-1][col+1]
-                let right2 = this.matrix[r-1][col+2]
-                let right3 = this.matrix[r-2][col+1]
-                let right4 = this.matrix[r-2][col+2]
+                if (this.willClear(this.matrix[r-1][col+2], this.matrix[r-1][col+1], bottom1)) return ClearPredict.ROW
+                if (this.willClear(this.matrix[r-2][col+2], this.matrix[r-2][col+1], bottom2)) return ClearPredict.ROW
+                if (this.willClear(this.matrix[r-3][col+2], this.matrix[r-3][col+1], topJw)) return ClearPredict.ROW
+                
+                // diagonal up (-->)
+                if (this.willClear(this.matrix[r-3][col+2], this.matrix[r-2][col+1], bottom1)) return ClearPredict.DIAGONAL_RIGHT
+                if (this.willClear(this.matrix[r-4][col+2], this.matrix[r-3][col+1], bottom2)) return ClearPredict.DIAGONAL_RIGHT
 
-                if (right1 && right2){
-                    if (right2.color === right1.color && right1.color === bottom1.color) return true
+                // diagonal down (-->)
+                if (r+1 < this.rowCount){
+                    if (this.willClear(this.matrix[r+1][col+2], this.matrix[r][col+1], bottom1)) return ClearPredict.DIAGONAL_RIGHT
+                    if (this.willClear(this.matrix[r][col+2], this.matrix[r-1][col+1], bottom2)) return ClearPredict.DIAGONAL_RIGHT
+                    if (this.willClear(this.matrix[r-1][col+2], this.matrix[r-2][col+1], topJw)) return ClearPredict.DIAGONAL_RIGHT
                 }
+            }
 
-                if (right3 && right4){
-                    if (right4.color === right3.color && right3.color === bottom2.color) return true
+            if (col > 0 && col < this.colCount - 1){
+                if (this.willClear(this.matrix[r-1][col-1], bottom1, this.matrix[r-1][col+1])) return ClearPredict.ROW
+                if (this.willClear(this.matrix[r-2][col-1], bottom2, this.matrix[r-2][col+1])) return ClearPredict.ROW
+                
+                // diagonals
+                if (this.willClear(this.matrix[r-3][col-1], bottom2, this.matrix[r-1][col+1])) return ClearPredict.DIAGONAL
+                if (this.willClear(this.matrix[r-1][col-1], bottom2, this.matrix[r-3][col+1])) return ClearPredict.DIAGONAL
+
+                if (r < this.rowCount){
+                    if (this.willClear(this.matrix[r-2][col-1], bottom1, this.matrix[r][col+1])) return ClearPredict.DIAGONAL
+                    if (this.willClear(this.matrix[r][col-1], bottom1, this.matrix[r-2][col+1])) return ClearPredict.DIAGONAL
                 }
             }
         }
 
-        return false
+        return null
+    }
+
+    private willClear(c1: Cell, c2: Cell, c3: Cell){
+        if (c1 && c2 && c3) return c1.color === c2.color && c2.color === c3.color
     }
 
     // ---- EFFECTS ----------------------

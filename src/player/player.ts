@@ -99,6 +99,7 @@ export default class Player {
                             // clear
                             let topCell = this.board.getTopCell(this.fallingBlock.col)
                             if (topCell) this.board.clearColor(topCell.color)
+                            this.multiplier = 0
                             break
                         case MagicStoneJewels.PUSH_DOWN:
                             // push down
@@ -140,7 +141,7 @@ export default class Player {
                     this.nextBlock = new MagicStone()
                 }
             }
-        } else if (this.timesInState >= 4) {
+        } else if (this.timesInState >= 7) {
             this.status = MatchStatus.APPLYING_GRAVITY
         }
 
@@ -148,16 +149,17 @@ export default class Player {
     }
 
     private stepGravity() {
-        let clears = this.board.currentClearCount
-        this.updateBlueScore(clears * this.multiplier * (Math.floor(this.blueScore / 30) + 1))
-
+        if (this.multiplier > 0){
+            let clears = this.board.currentClearCount
+            this.updateBlueScore(clears * this.multiplier * (Math.floor(this.blueScore / 30) + 1))
+            this.clearCount += clears
+            this.whiteEl.innerHTML = this.clearCount.toString()
+            this.multiplier += 4
+        }   
+        
         this.board.clearPending()
         this.status = MatchStatus.CLEARING
         this.timesInState = 0
-        this.multiplier += 4
-
-        this.clearCount += clears
-        this.whiteEl.innerHTML = this.clearCount.toString()
     }
 
     // ---- EFFECTS -----------------------------
@@ -179,13 +181,9 @@ export default class Player {
         this.opponent.breakFallingBlock()
         this.sfx.playNormalPush()
 
-        let attemptsLeft = 100
-        let trashPushed = 0
-
-        while (--attemptsLeft > 0 && trashPushed < 2){
-            let randomIndex = Math.floor(Math.random() * this.board.colCount)
-            let added = this.opponent.board.poisonColumn(randomIndex)
-            if (added) trashPushed++
+        // add one mysterious jewel in each column
+        for (let c=0; c<this.board.colCount; c++){
+            this.opponent.board.poisonColumn(c)
         }
     }
 

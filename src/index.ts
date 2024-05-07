@@ -21,7 +21,7 @@ for (let i=0; i<3; i++){
 
 // COMMON SETUP
 const sfx = new SFX(STAGE)
-const blockGenerator = new BlockGenerator([0, 3, 4, 5])
+const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 
 // SETUP FOR PLAYER 1
 let player1 = new CpuPlayer(document, "left", sfx, blockGenerator)

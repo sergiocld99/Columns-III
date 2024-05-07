@@ -6,6 +6,8 @@ export default class SFX {
     }
 
     playClear(i: number){
+        i = Math.max(1, Math.min(i, 6))
+
         switch (this.stage){
             case 4:
             case 5:

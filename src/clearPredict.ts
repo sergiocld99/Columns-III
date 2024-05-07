@@ -1,0 +1,1 @@
+export const enum ClearPredict { COLUMN = 1, ROW, DIAGONAL, DIAGONAL_LEFT, DIAGONAL_RIGHT }

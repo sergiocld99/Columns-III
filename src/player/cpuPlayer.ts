@@ -1,4 +1,5 @@
 import BlockGenerator from "../block/blockGenerator.js";
+import { ClearPredict } from "../clearPredict.js";
 import { COLOR_VARIANTS_COUNT } from "../jewel.js";
 import SFX from "../sfx.js";
 import { randInt } from "../utils.js";
@@ -8,6 +9,7 @@ export default class CpuPlayer extends Player {
     auxTicks = 0
     doNotMove = false
     targetCol = 0
+    maxSpeed = 0.5
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
         super(document, preffix, sfx, blockGenerator, true)
@@ -17,63 +19,48 @@ export default class CpuPlayer extends Player {
         super.reset()
         this.doNotMove = false
         this.targetCol = 0
-        this.speed = 0.20
+        this.speed = 0.10
     }
 
     nextFallingBlock(): void {
         super.nextFallingBlock()
         this.doNotMove = false
+        this.speed = 0.10
 
         // is player in risk?
         if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
             this.targetCol = 5
-            this.speed = 0.10
             return
         } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
             this.targetCol = 0
-            this.speed = 0.10
             return
-        }
+        } else if (this.fallingBlock.colorCount < 3 && this.board.isColumnEmpty(2)){
+            this.targetCol = 2
+            return
+        }   
 
         // build column candidates
         let candidates = new Set<number>
         for (let i=0; i<4; i++) candidates.add(randInt(this.board.colCount))
         candidates.delete(2)
 
-        // get block type
-        let colorCount = this.fallingBlock.colorCount
+        // find max height to avoid it
         let currentHeight: number
+        let minHeight = this.board.rowCount   
 
-        if (colorCount === 3){
-            // find max height to avoid it
-            let maxHeight = 0   
-    
-            candidates.forEach(col => {
-                currentHeight = this.board.getColumnHeight(col)
-                if (currentHeight > maxHeight){
-                    maxHeight = currentHeight
-                    this.targetCol = col < 2 ? 5 : 0
-                }
-            })
-        } else {
-            if (this.board.getColumnHeight(2) === 0){
-                this.targetCol = 2
+        candidates.forEach(col => {
+            currentHeight = this.board.getPonderedColumnHeight(col)
+            if (currentHeight === 0 && this.fallingBlock.colorCount < 3){
+                this.targetCol = col
                 return
             }
 
-            let minHeight = this.board.rowCount
-
-            candidates.forEach(col => {
-                currentHeight = this.board.getColumnHeight(col)
-                if (currentHeight < minHeight){
-                    minHeight = currentHeight
-                    this.targetCol = col
-                }
-            })
-        }
-
-        
-        
+            if (currentHeight < minHeight){
+                minHeight = currentHeight
+                this.targetCol = col
+                //this.targetCol = col < 2 ? 5 : 0
+            }
+        })  
     }
 
     stepFalling(){
@@ -84,20 +71,18 @@ export default class CpuPlayer extends Player {
             this.auxTicks = 0
 
             let currentCol = this.fallingBlock.col
-            let success = true
-
-            if (currentCol === this.targetCol) this.doNotMove = true
-            else if (currentCol > this.targetCol) success = this.fallingBlock.moveLeft(this.board)
-            else success = this.fallingBlock.moveRight(this.board)
+            if (currentCol > this.targetCol) this.fallingBlock.moveLeft(this.board)
+            else if (currentCol < this.targetCol) this.fallingBlock.moveRight(this.board)
         }
 
         if (this.auxTicks % 5 === 0){
             let topCell = this.board.getTopCell(this.fallingBlock.col)
             let bottom1 = this.fallingBlock.getBottomJewel()
             let bottom2 = this.fallingBlock.getMediumJewel()
+            let fallingTop = this.fallingBlock.jewels[0]
 
             if (this.fallingBlock.isMagicStone()){
-                this.speed = 0.20
+                this.speed = this.maxSpeed
 
                 if (topCell?.mysterious){
                     if (!this.fallingBlock.getBottomJewel().isPushDownType())
@@ -109,11 +94,15 @@ export default class CpuPlayer extends Player {
                     if (!this.fallingBlock.getBottomJewel().isClearType())
                         this.fallingBlock.rotate(this.sfx)
                 }
-            } else if (this.board.canClear(bottom1, bottom2, this.fallingBlock.col)){
+            } else if (this.board.canClear(bottom1, bottom2, fallingTop, this.fallingBlock.col)){
                 this.doNotMove = true
-                this.speed = 0.20
+                this.speed = this.maxSpeed
             } else {
+                this.doNotMove = false
+
                 if (this.board.isColumnEmpty(this.fallingBlock.col)){
+                    this.speed = this.maxSpeed
+
                     if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
                         this.fallingBlock.rotate(this.sfx)
                     }
