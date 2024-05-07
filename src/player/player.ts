@@ -261,6 +261,7 @@ export default abstract class Player {
         this.nextFallingBlock()
         this.timesInState = 0
         this.ticks = 0
+        this.multiplier = 3
     }
 
     pause(){

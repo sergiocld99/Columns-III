@@ -21,6 +21,7 @@ export default abstract class CpuPlayer extends Player {
         this.targetCol = 0
         this.speed = 0.10
         this.timesRotated = 0
+        this.inRisk = false
     }
 
     nextFallingBlock(): void {
@@ -39,7 +40,7 @@ export default abstract class CpuPlayer extends Player {
             this.targetCol = 0
             this.inRisk = true
             return
-        } else {
+        } else if (this.fallingBlock.isMagicStone()){
             this.inRisk = false
         }
         
