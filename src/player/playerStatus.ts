@@ -1,5 +1,5 @@
-const enum MatchStatus { 
+const enum PlayerStatus { 
     FALLING_BLOCK, CLEARING, APPLYING_GRAVITY, PAUSE
 }
 
-export default MatchStatus
+export default PlayerStatus

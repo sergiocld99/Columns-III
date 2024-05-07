@@ -1,7 +1,7 @@
 import Board from "../board.js";
 import FallingBlock from "../block/fallingBlock.js";
 import { COLOR_VARIANTS_COUNT, MagicStoneJewels } from "../jewel.js";
-import MatchStatus from "../matchStatus.js";
+import PlayerStatus from "./playerStatus.js";
 import NextBlock from "../block/nextBlock.js";
 import SFX from "../sfx.js";
 import BlockGenerator from "../block/blockGenerator.js";
@@ -32,7 +32,7 @@ export default class Player {
     // match status
     blueScore = 0
     clearCount = 0
-    status = MatchStatus.FALLING_BLOCK
+    status = PlayerStatus.PAUSE
     timesInState = 0
     ticks = 0
     multiplier = 3
@@ -61,16 +61,16 @@ export default class Player {
 
     loop() {
         switch (this.status) {
-            case MatchStatus.FALLING_BLOCK:
+            case PlayerStatus.FALLING_BLOCK:
                 this.stepFalling()
                 break
-            case MatchStatus.CLEARING:
+            case PlayerStatus.CLEARING:
                 this.stepClearing()
                 break
-            case MatchStatus.APPLYING_GRAVITY:
+            case PlayerStatus.APPLYING_GRAVITY:
                 this.stepGravity()
                 break
-            case MatchStatus.PAUSE:
+            case PlayerStatus.PAUSE:
                 break
         }
     }
@@ -84,7 +84,7 @@ export default class Player {
             let success = this.board.placeBlock(this.fallingBlock)
 
             if (success) {
-                this.status = MatchStatus.CLEARING
+                this.status = PlayerStatus.CLEARING
                 this.timesInState = 0
                 this.multiplier = 3
 
@@ -110,6 +110,7 @@ export default class Player {
                 }
 
             } else {
+                this.sfx.playLose()
                 this.pause()
             }
 
@@ -124,7 +125,7 @@ export default class Player {
             if (recheck) {
                 this.sfx.playClear(Math.ceil(this.multiplier / 4))
             } else {
-                this.status = MatchStatus.FALLING_BLOCK
+                this.status = PlayerStatus.FALLING_BLOCK
 
                 // push
                 if (this.multiplier >= 7 && this.shouldPush()){
@@ -134,7 +135,7 @@ export default class Player {
 
                 // arrow generation
                 if (this.clearCount >= this.lastArrowCount + 20){
-                    this.sfx.playSummonArrow()
+                    this.sfx.playMagicStone()
                     this.lastArrowCount = this.clearCount
                     //this.board.clearMysterious()
                     //this.board.clearColor(this.fallingBlock.jewels[2].color)
@@ -142,7 +143,7 @@ export default class Player {
                 }
             }
         } else if (this.timesInState >= 7) {
-            this.status = MatchStatus.APPLYING_GRAVITY
+            this.status = PlayerStatus.APPLYING_GRAVITY
         }
 
         this.timesInState++
@@ -158,14 +159,14 @@ export default class Player {
         }   
         
         this.board.clearPending()
-        this.status = MatchStatus.CLEARING
+        this.status = PlayerStatus.CLEARING
         this.timesInState = 0
     }
 
     // ---- EFFECTS -----------------------------
 
     public breakFallingBlock(): void {
-        if (this.status === MatchStatus.FALLING_BLOCK){
+        if (this.status === PlayerStatus.FALLING_BLOCK){
             this.nextFallingBlock()
             this.sfx.playBreak()
         }
@@ -188,7 +189,7 @@ export default class Player {
     }
 
     protected pushOpponent() {
-        if (!this.opponent || this.blueScore < 10 || this.status != MatchStatus.FALLING_BLOCK) return
+        if (!this.opponent || this.blueScore < 10 || this.status != PlayerStatus.FALLING_BLOCK) return
         this.opponent.breakFallingBlock()
 
         let count = Math.floor(this.blueScore / 10)
@@ -243,21 +244,21 @@ export default class Player {
         this.lastArrowCount = 0
         this.blueEl.innerHTML = this.blueScore.toString()
         this.whiteEl.innerHTML = this.clearCount.toString()
-        this.status = MatchStatus.FALLING_BLOCK
+        this.status = PlayerStatus.FALLING_BLOCK
         this.currentBlockIndex = 0
         this.nextBlock = this.blockGenerator.getCopy(this.currentBlockIndex)
         this.nextFallingBlock()
         this.timesInState = 0
         this.ticks = 0
 
-        if (this.opponent && this.opponent.status != MatchStatus.FALLING_BLOCK){
+        if (this.opponent && this.opponent.status != PlayerStatus.FALLING_BLOCK){
             this.opponent?.reset()
         }
     }
 
     pause(){
-        this.status = MatchStatus.PAUSE
-        if (this.opponent && this.opponent.status != MatchStatus.PAUSE){
+        this.status = PlayerStatus.PAUSE
+        if (this.opponent && this.opponent.status != PlayerStatus.PAUSE){
             this.opponent.pause()
         }
     }

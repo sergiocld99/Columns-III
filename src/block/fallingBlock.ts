@@ -63,6 +63,12 @@ export default class FallingBlock extends Block {
         return this.jewels[0].isMagicStoneType()
     }
 
+    getRepeatedColor(): number {
+        let res = this.jewels[0].color
+        if (this.jewels[1].color === res) return res
+        else return this.jewels[2].color
+    }
+
     private getUniqueColorCount(): number {
         let colors = new Set<number>
         this.jewels.forEach(j => colors.add(j.color))

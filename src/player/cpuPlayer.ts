@@ -10,6 +10,7 @@ export default class CpuPlayer extends Player {
     doNotMove = false
     targetCol = 0
     maxSpeed = 0.5
+    timesRotated = 0
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
         super(document, preffix, sfx, blockGenerator, true)
@@ -20,12 +21,14 @@ export default class CpuPlayer extends Player {
         this.doNotMove = false
         this.targetCol = 0
         this.speed = 0.10
+        this.timesRotated = 0
     }
 
     nextFallingBlock(): void {
         super.nextFallingBlock()
         this.doNotMove = false
         this.speed = 0.10
+        this.timesRotated = 0
 
         // is player in risk?
         if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
@@ -34,10 +37,26 @@ export default class CpuPlayer extends Player {
         } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
             this.targetCol = 0
             return
-        } else if (this.fallingBlock.colorCount < 3 && this.board.isColumnEmpty(2)){
-            this.targetCol = 2
-            return
-        }   
+        } 
+        
+        // quick search
+        if (this.fallingBlock.colorCount < 3){
+            if (this.board.isColumnEmpty(2)){
+                this.targetCol = 2
+                return
+            }  
+
+            let targetColor = this.fallingBlock.getRepeatedColor()
+            let topCell
+            
+            for (let c=0; c<this.board.colCount; c++){
+                topCell = this.board.getTopCell(c)
+                if (topCell && topCell.color === targetColor){
+                    this.targetCol = c
+                    return
+                }
+            }
+        } 
 
         // build column candidates
         let candidates = new Set<number>
@@ -71,8 +90,14 @@ export default class CpuPlayer extends Player {
             this.auxTicks = 0
 
             let currentCol = this.fallingBlock.col
-            if (currentCol > this.targetCol) this.fallingBlock.moveLeft(this.board)
-            else if (currentCol < this.targetCol) this.fallingBlock.moveRight(this.board)
+
+            if (currentCol > this.targetCol) {
+                this.fallingBlock.moveLeft(this.board)
+                this.timesRotated = 0
+            } else if (currentCol < this.targetCol) {
+                this.fallingBlock.moveRight(this.board)
+                this.timesRotated = 0
+            }
         }
 
         if (this.auxTicks % 5 === 0){
@@ -106,7 +131,7 @@ export default class CpuPlayer extends Player {
                     if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
                         this.fallingBlock.rotate(this.sfx)
                     }
-                } else {
+                } else if (++this.timesRotated < 4) {
                     this.fallingBlock.rotate(this.sfx)
                 }
             }

@@ -1,12 +1,12 @@
 import BlockGenerator from "./block/blockGenerator.js";
-import MatchStatus from "./matchStatus.js";
+import PlayerStatus from "./player/playerStatus.js";
 import CpuPlayer from "./player/cpuPlayer.js";
 import ManualPlayer from "./player/manualPlayer.js";
 import SFX from "./sfx.js";
 import { randInt } from "./utils.js";
+import Match from "./match/match.js";
 
-const STAGE = randInt(3) + 3
-setTimeout(() => sfx.playBgm(), 3000);
+const STAGE = randInt(5) + 1
 
 let imgJewels: HTMLImageElement[] = Array(6)
 for (let i=0; i<imgJewels.length; i++) 
@@ -35,6 +35,9 @@ player2.drawNextBlock(imgJewels)
 player1.opponent = player2
 player2.opponent = player1
 
+const match = new Match(sfx, player1, player2)
+setTimeout(() => match.start(), 1000)
+
 // LOOPS
 setInterval(() => {
     player1.loop()
@@ -51,7 +54,7 @@ setInterval(() => {
 
 document.addEventListener("keydown", e => {
     if (e.key === "Enter"){
-        if (player1.status === MatchStatus.PAUSE){
+        if (player1.status === PlayerStatus.PAUSE){
             player1.reset()
         }
     }
