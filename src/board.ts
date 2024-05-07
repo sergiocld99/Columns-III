@@ -354,7 +354,7 @@ export default class Board {
             }
         }
 
-        if (fallingBlock.colorCount === 1) return ClearPredict.COLUMN
+        //if (fallingBlock.colorCount === 1) return ClearPredict.COLUMN
 
         const bottom1 = fallingBlock.getBottomJewel()
         const bottom2 = fallingBlock.getMediumJewel()

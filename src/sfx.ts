@@ -2,6 +2,9 @@ import Match from "./match/match.js"
 
 export default class SFX {
     stage: number
+    bgm: HTMLAudioElement | null = null
+    bgmInterv: number | null = null
+    fadingInterv: number | null = null
 
     constructor(stage: number){
         this.stage = stage
@@ -43,9 +46,12 @@ export default class SFX {
 
     playLose(){
         this.playSound("lose")
+        this.stopBgm()
     }
 
     playIntro(match: Match){
+        if (this.fadingInterv) clearInterval(this.fadingInterv)
+        
         const intro = new Audio(`bgm/intro-0${this.stage}.mp3`)
         intro.play()
 
@@ -55,18 +61,34 @@ export default class SFX {
     }
 
     playBgm(){
-        const bgm = new Audio(`bgm/st-0${this.stage}.bgm`);
-        bgm.play();
+        this.bgm = new Audio(`bgm/st-0${this.stage}.bgm`);
+        this.bgm.play();
 
-        if (this.stage === 1) bgm.volume = 0.5
-        else if (this.stage === 4) bgm.volume = 0.7
+        if (this.stage === 1) this.bgm.volume = 0.5
+        else if (this.stage === 4) this.bgm.volume = 0.7
 
-        let interv = window.setInterval(() => {
-            if (bgm.currentTime > bgm.duration - 1){
-                this.playBgm()
-                clearInterval(interv)
+        this.bgmInterv = window.setInterval(() => {
+            if (this.bgm){
+                if (this.bgm.currentTime > this.bgm.duration - 1){
+                    this.playBgm()
+                    if (this.bgmInterv) clearInterval(this.bgmInterv)
+                }
             }
+
         }, 1000)
+    }
+
+    stopBgm(){
+        if (this.bgmInterv) clearInterval(this.bgmInterv)
+
+        this.fadingInterv = window.setInterval(() => {
+            if (this.bgm && this.bgm.volume > 0){
+                this.bgm.volume -= 0.1
+            } else {
+                this.bgm?.pause()
+                this.bgm = null
+            }
+        }, 500)
     }
 
     private playDelayed(name: string, delayMs: number){

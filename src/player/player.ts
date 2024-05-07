@@ -6,6 +6,7 @@ import NextBlock from "../block/nextBlock.js";
 import SFX from "../sfx.js";
 import BlockGenerator from "../block/blockGenerator.js";
 import MagicStone from "../block/magicStone.js";
+import CpuPlayer from "./cpuPlayer.js";
 
 export default abstract class Player {
     nextBlock: NextBlock
@@ -34,7 +35,7 @@ export default abstract class Player {
     // match status
     blueScore = 0
     clearCount = 0
-    status = PlayerStatus.PAUSE
+    status = PlayerStatus.WAITING
     timesInState = 0
     ticks = 0
     multiplier = 3
@@ -254,16 +255,12 @@ export default abstract class Player {
         this.lastArrowCount = 0
         this.blueEl.innerHTML = this.blueScore.toString()
         this.whiteEl.innerHTML = this.clearCount.toString()
-        this.status = PlayerStatus.FALLING_BLOCK
+        this.status = PlayerStatus.WAITING
         this.currentBlockIndex = 0
         this.nextBlock = this.blockGenerator.getCopy(this.currentBlockIndex)
         this.nextFallingBlock()
         this.timesInState = 0
         this.ticks = 0
-
-        if (this.opponent && this.opponent.status != PlayerStatus.FALLING_BLOCK){
-            this.opponent?.reset()
-        }
     }
 
     pause(){

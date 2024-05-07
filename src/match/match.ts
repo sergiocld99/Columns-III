@@ -15,6 +15,7 @@ export default class Match {
     }
 
     start(){
+        this.status = MatchStatus.STARTING
         this.sfx.playIntro(this)
     }
 
@@ -25,5 +26,10 @@ export default class Match {
             p.status = PlayerStatus.FALLING_BLOCK
             p.nextFallingBlock()
         })
+    }
+
+    reset(){
+        this.players.forEach(p => p.reset())
+        this.start()
     }
 }
