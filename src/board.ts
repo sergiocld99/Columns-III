@@ -2,6 +2,7 @@ import Block from "./block/block.js";
 import FallingBlock from "./block/fallingBlock.js";
 import { ClearPredict } from "./clearPredict.js";
 import { Jewel } from "./jewel.js";
+import JewelOutside from "./jewelOutside.js";
 
 type Cell = Jewel | null
 type Position = [number, number]
@@ -12,6 +13,7 @@ export default class Board {
     currentClearCount = 0
     rowCount: number
     colCount: number
+    jewelsOutside: JewelOutside[] = []
 
     constructor(rows: number, cols: number){
         this.rowCount = rows
@@ -47,22 +49,22 @@ export default class Board {
         } else {
             // from bottom to top
             for (let i=2; i>=0; i--){
-                if (r+i < 0) return false
-                this.matrix[r+i][block.col] = block.jewels[i]
+                //if (r+i < 0) return false
+                if (r+i < 0) this.jewelsOutside.push(new JewelOutside(block.jewels[i].color, block.col))
+                else this.matrix[r+i][block.col] = block.jewels[i]
             }
         }
-        
 
-        return true
+        return this.jewelsOutside.length < 3
     }
 
     // ---- AFTER BLOCK PLACED ----------------------------
 
-    clearPending() {
+    clearPending() : boolean {
         this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
         this.toClear = []
         this.currentClearCount = 0
-        this.applyGravityEverywhere()
+        return this.applyGravityEverywhere()
     }
 
     checkEverything() : boolean {        
@@ -239,8 +241,22 @@ export default class Board {
         this.currentClearCount += (count - 2)
     }
 
-    applyGravityEverywhere(){
+    private applyGravityEverywhere(): boolean {
         const bottomRow = this.rowCount - 1
+
+        // add jewels that were outside
+        // array is ordered from bottom to top
+        this.jewelsOutside.forEach((jo, i) => {
+            let r = this.jewelsOutside.length-i-1
+            if (this.matrix[r][jo.column] === null){
+                this.matrix[r][jo.column] = new Jewel(jo.color)
+            } else {
+                return false
+            }
+        })
+
+        // clear jewels outside
+        this.jewelsOutside = []
 
         for (let c=0; c<this.colCount; c++){
             let spaces = 0
@@ -256,6 +272,8 @@ export default class Board {
                 }
             }
         }
+
+        return true
     }
 
     // ----------------------------------------------------
@@ -278,6 +296,7 @@ export default class Board {
         })
 
         this.toClear = []
+        this.jewelsOutside = []
     }
 
     // ---- CPU STRATEGIES ----------------
@@ -344,6 +363,35 @@ export default class Board {
         }
 
         return res
+    }
+
+    getTopCellsSameColor(col: number): Cell {
+        let res = null
+        let r = 0
+
+        // from top to bottom
+        while (r < this.rowCount){
+            let aux = this.matrix[r][col]
+            
+            if (aux){
+                if (res === null) res = aux
+                else if (res.color === aux.color) return res
+                else return null
+            }
+
+            r++
+        }
+
+        return null
+    }
+
+    findTargetColumn(jw: Jewel): number | null {
+        for (let c=0; c<this.colCount; c++){
+            let curr = this.getTopCellsSameColor(c)
+            if (curr && curr.equals(jw)) return c
+        }
+
+        return null
     }
 
     canClear(fallingBlock: FallingBlock): ClearPredict | null {
@@ -488,7 +536,12 @@ export default class Board {
 
     removeColumn(col: number){
         for (let r=0; r<this.rowCount; r++){
-            this.matrix[r][col] = null
+            let cell = this.matrix[r][col]
+
+            if (cell && !cell.isMagicStoneType()){
+                this.matrix[r][col] = null
+            }
+            
         }
     }
 }

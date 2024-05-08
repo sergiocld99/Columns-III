@@ -32,15 +32,17 @@ export default abstract class CpuPlayer extends Player {
         this.targetCol = -1
 
         // is player in risk?
-        if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
-            this.targetCol = 5
-            this.inRisk = true
-            return
-        } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
-            this.targetCol = 0
-            this.inRisk = true
-            return
-        } else if (this.fallingBlock.isMagicStone()){
+        // if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
+        //     this.targetCol = 5
+        //     this.inRisk = true
+        //     return
+        // } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
+        //     this.targetCol = 0
+        //     this.inRisk = true
+        //     return
+        // } 
+        
+        if (this.fallingBlock.isMagicStone()){
             this.inRisk = false
         }
         
@@ -56,12 +58,22 @@ export default abstract class CpuPlayer extends Player {
             
             for (let c=0; c<this.board.colCount; c++){
                 topCell = this.board.getTopCell(c)
-                if (topCell && topCell.color === targetColor && this.board.matrix[2][c] === null){
+                if (topCell && topCell.color === targetColor && this.board.matrix[1][c] === null){
                     this.targetCol = c
                     return
                 }
             }
-        } 
+        } else {
+            // for each jewel
+            for(let i=0; i<3; i++){
+                let candidate = this.board.findTargetColumn(this.fallingBlock.jewels[i])
+                if (candidate) {
+                    this.targetCol = candidate
+                    console.log(this.getName(), " - Best target: column", candidate)
+                    return
+                }
+            }
+        }
 
         // build column candidates
         let candidates = new Set<number>
@@ -76,9 +88,12 @@ export default abstract class CpuPlayer extends Player {
             currentHeight = this.board.getPonderedColumnHeight(col)
 
             if (currentHeight < minHeight && this.board.matrix[2][col] === null){
-                minHeight = currentHeight
-                this.targetCol = col
-                //this.targetCol = col < 2 ? 5 : 0
+                if (this.fallingBlock.colorCount === 2 && this.board.getTopCellsSameColor(col)){
+                     console.log("Not choosing column", col)
+                } else {
+                    minHeight = currentHeight
+                    this.targetCol = col
+                }   
             }
         })  
 
@@ -86,7 +101,7 @@ export default abstract class CpuPlayer extends Player {
         if (this.targetCol === -1){
             this.inRisk = true
             this.targetCol = this.board.getLowestColumn()
-            console.log(this.getName(), "is about to lose...")
+            //console.log(this.getName(), "is about to lose...")
             setTimeout(() => this.pushOpponent(), 500)
         }
     }
@@ -95,7 +110,7 @@ export default abstract class CpuPlayer extends Player {
         super.stepFalling()
         this.auxTicks++
 
-        if (this.auxTicks >= 7 && this.fallingBlock.row > -2 && !this.doNotMove){
+        if (this.auxTicks >= 5 && this.fallingBlock.row > -2 && !this.doNotMove){
             this.auxTicks = 0
 
             let currentCol = this.fallingBlock.col
@@ -137,6 +152,8 @@ export default abstract class CpuPlayer extends Player {
                     this.fallingBlock.rotate(this.sfx)
                 } else if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
                     this.fallingBlock.rotate(this.sfx)
+                } else if (!this.inRisk && this.opponent?.inRisk){
+                    this.speedUp()
                 }
             }
         }

@@ -14,7 +14,7 @@ export default class Sphinx extends CpuPlayer {
         if (this.blueScore < 10 || !this.opponent) return false
         if (this.inRisk || this.opponent.inRisk) return true
         if (this.opponent.status === PlayerStatus.FALLING_BLOCK){
-            if (this.opponent.fallingBlock.isMagicStone() || this.fallingBlock.colorCount === 1){
+            if (this.opponent.fallingBlock.isMagicStone() || this.opponent.fallingBlock.colorCount === 1){
                 return true
             }
         }
@@ -23,6 +23,8 @@ export default class Sphinx extends CpuPlayer {
     }
 
     protected manageMagicStone(topCell: Jewel | null): MagicStoneJewels {
+        if (this.inRisk) return MagicStoneJewels.CLEAR
+
         if (this.board.getColumnHeight(this.fallingBlock.col) <= 4 || this.opponent?.inRisk){
             return MagicStoneJewels.PUSH_UP
         } else if (topCell?.mysterious){

@@ -38,7 +38,7 @@ const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 loadImgJewels(sfx.stage)
 
 // SETUP FOR PLAYER 1
-let player1 = new Sphinx(document, "left", sfx, blockGenerator)
+let player1 = new Mommy(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
@@ -77,7 +77,7 @@ setInterval(() => {
     characterTick = (characterTick+1) % 2
     let resource: HTMLImageElement
 
-    if (player2.inRisk){
+    if (player2.inRisk && player1.board.matrix[0][2] === null){
         resource = characterTick ? sphinxImgs[1] : sphinxImgs[0]
     } else {
         resource = player1.inRisk ? sphinxImgs[2] : sphinxImgs[0]

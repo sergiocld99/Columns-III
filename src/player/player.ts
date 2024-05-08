@@ -80,6 +80,11 @@ export default abstract class Player {
     }
 
     protected stepFalling() {
+        if (this.board.jewelsOutside.length){
+            this.sfx.playLose()
+            this.pause()
+        }
+
         this.fallingBlock.row += this.speed
 
         if (this.fallingBlock.row > this.board.getLastEmptyRow(this.fallingBlock.col) - 2) {
@@ -129,6 +134,7 @@ export default abstract class Player {
             if (recheck) {
                 this.sfx.playClear(Math.ceil(this.multiplier / 4))
             } else {
+
                 this.status = PlayerStatus.FALLING_BLOCK
                 this.nextFallingBlock()
 
@@ -162,9 +168,15 @@ export default abstract class Player {
             this.multiplier += 4
         }   
         
-        this.board.clearPending()
-        this.status = PlayerStatus.CLEARING
-        this.timesInState = 0
+        if (this.board.clearPending()){
+            // there are no jewels outside
+            this.status = PlayerStatus.CLEARING
+            this.timesInState = 0
+
+        } else {
+            this.sfx.playLose()
+            this.pause()
+        }
     }
 
     // ---- EFFECTS -----------------------------

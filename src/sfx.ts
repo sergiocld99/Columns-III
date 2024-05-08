@@ -62,6 +62,7 @@ export default class SFX {
     }
 
     playBgm(match: Match){
+        if (this.fadingInterv) clearInterval(this.fadingInterv)
         this.bgm = new Audio(`bgm/st-0${this.stage}.bgm`);
         this.bgm.play();
 
@@ -81,6 +82,7 @@ export default class SFX {
 
     stopBgm(){
         if (this.bgmInterv) clearInterval(this.bgmInterv)
+        if (this.fadingInterv) clearInterval(this.fadingInterv)
 
         this.fadingInterv = window.setInterval(() => {
             if (this.bgm && this.bgm.volume > 0){
@@ -88,6 +90,7 @@ export default class SFX {
             } else {
                 this.bgm?.pause()
                 this.bgm = null
+                if (this.fadingInterv) clearInterval(this.fadingInterv)
             }
         }, 500)
     }
