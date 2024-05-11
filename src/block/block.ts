@@ -11,9 +11,9 @@ export default abstract class Block {
         this.col = col
     }
 
-    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D){
+    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D, bw: boolean){
         this.jewels.forEach((jw, i) => {
-            jw.draw(imgJewels, ctx, this.row+i, this.col)
+            jw.draw(imgJewels, ctx, this.row+i, this.col, bw)
         })
     }
 

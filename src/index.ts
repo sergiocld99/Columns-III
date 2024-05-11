@@ -14,7 +14,8 @@ let imgJewels: HTMLImageElement[] = []
 function loadImgJewels(stage: number) {
     imgJewels = Array(6)
 
-    for (let j=0; j<imgJewels.length; j++){
+    // normal jewels
+    for (let j=0; j<6; j++){
         let img = new Image()
         img.src = `jewels/st${stage < 4 ? 1 : stage}-${j+1}.png`
         imgJewels[j] = img
@@ -26,6 +27,13 @@ function loadImgJewels(stage: number) {
     for (let i=0; i<3; i++){
         let img = new Image()
         img.src = `jewels/ms-${i+1}.png`
+        imgJewels.push(img)
+    }
+
+    // black and white jewels
+    for (let j=0; j<6; j++){
+        let img = new Image()
+        img.src = `jewels/st${stage < 4 ? 1 : stage}-${j+1}-bw.png`
         imgJewels.push(img)
     }
 }
@@ -88,10 +96,10 @@ setInterval(() => {
     characterTick = (characterTick+1) % 2
     let resource: HTMLImageElement
 
-    if (player2.inRisk && player1.board.matrix[0][2] === null){
+    if (player2.isScared() && player1.board.matrix[0][2] === null){
         resource = characterTick ? sphinxImgs[1] : sphinxImgs[0]
     } else {
-        resource = player1.inRisk ? sphinxImgs[2] : sphinxImgs[0]
+        resource = player1.isScared() ? sphinxImgs[2] : sphinxImgs[0]
     }
 
     characterCtx.drawImage(resource, 0, 0, 231, 231, 0, 0, 150, 150)

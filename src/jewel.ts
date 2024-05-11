@@ -35,11 +35,25 @@ export class Jewel {
         return this.color === MagicStoneJewels.PUSH_DOWN
     }
 
-    draw(imgs: HTMLImageElement[], ctx: CanvasRenderingContext2D, row: number, col: number){
+    draw(imgs: HTMLImageElement[], ctx: CanvasRenderingContext2D, row: number, col: number, bw: boolean){
         let mx = 5, my = 4
         let dx = col*50+mx, dy = row*50+my
         let dw = 50-mx*2, dh = 50-my*2
-        let resource = (this.mysterious && !this.clearing) ? imgs[6] : imgs[this.color]
+        let resource: HTMLImageElement
+        
+        if (this.mysterious){
+            if (this.clearing){
+                resource = imgs[(bw ? 10:0) + this.color]
+            } else {
+                resource = imgs[6]
+            }
+        } else {
+            if (this.isMagicStoneType()){
+                resource = imgs[this.color]
+            } else {
+                resource = imgs[(bw ? 10:0) + this.color]
+            }
+        }
 
         ctx.drawImage(resource,dx,dy,dw,dh)
     }

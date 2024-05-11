@@ -21,7 +21,6 @@ export default abstract class CpuPlayer extends Player {
         this.targetCol = -1
         this.speed = 0.10
         this.timesRotated = 0
-        this.inRisk = false
     }
 
     nextFallingBlock(): void {
@@ -30,21 +29,6 @@ export default abstract class CpuPlayer extends Player {
         this.doNotMove = false
         this.timesRotated = 0
         this.targetCol = -1
-
-        // is player in risk?
-        // if (this.board.getColumnHeight(1) > this.board.rowCount - 3){
-        //     this.targetCol = 5
-        //     this.inRisk = true
-        //     return
-        // } else if (this.board.getColumnHeight(3) > this.board.rowCount - 3) {
-        //     this.targetCol = 0
-        //     this.inRisk = true
-        //     return
-        // } 
-        
-        if (this.fallingBlock.isMagicStone()){
-            this.inRisk = false
-        }
         
         // quick search
         if (this.fallingBlock.colorCount < 3){
@@ -99,9 +83,7 @@ export default abstract class CpuPlayer extends Player {
 
         // still no luck...
         if (this.targetCol === -1){
-            this.inRisk = true
             this.targetCol = this.board.getLowestColumn()
-            //console.log(this.getName(), "is about to lose...")
             setTimeout(() => this.pushOpponent(), 500)
         }
     }
@@ -152,7 +134,7 @@ export default abstract class CpuPlayer extends Player {
                     this.fallingBlock.rotate(this.sfx)
                 } else if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
                     this.fallingBlock.rotate(this.sfx)
-                } else if (!this.inRisk && this.opponent?.inRisk){
+                } else if (!this.isScared() && this.opponent?.isScared()){
                     this.speedUp()
                 }
             }
@@ -161,17 +143,12 @@ export default abstract class CpuPlayer extends Player {
 
     private speedUp(){
         if (this.fallingBlock.row > this.getMinRowForSpeeding()){
-            this.speed = this.maxSpeed
+            this.speed = this.maxSpeed / (this.poisoned ? 2 : 1)
         }
     }
 
     private slowDown(){
         this.speed = 0.10
-    }
-
-    protected pushOpponent(): void {
-        if (this.blueScore >= 20) this.inRisk = false
-        super.pushOpponent()
     }
 
     drawBoard(imgJewels: HTMLImageElement[]): void {

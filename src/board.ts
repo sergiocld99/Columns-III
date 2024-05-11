@@ -278,11 +278,19 @@ export default class Board {
 
     // ----------------------------------------------------
 
-    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D, ticks: number){
+    hasJewelsInRow(r: number): boolean {
+        for (let c=1; c<this.colCount-1; c++){
+            if (this.matrix[r][c]) return true
+        }
+
+        return false
+    }
+
+    draw(imgJewels: HTMLImageElement[], ctx: CanvasRenderingContext2D, ticks: number, bw: boolean){
         this.matrix.forEach((row, y) => {
             row.forEach((jw, x) => {
                 if (jw && (ticks % 10 < 5 || jw.clearing === false)) {
-                    jw.draw(imgJewels, ctx, y, x)
+                    jw.draw(imgJewels, ctx, y, x, bw)
                 }
             })
         })
@@ -297,6 +305,7 @@ export default class Board {
 
         this.toClear = []
         this.jewelsOutside = []
+        this.currentClearCount = 0
     }
 
     // ---- CPU STRATEGIES ----------------

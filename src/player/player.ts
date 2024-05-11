@@ -1,12 +1,11 @@
 import Board from "../board.js";
 import FallingBlock from "../block/fallingBlock.js";
-import { COLOR_VARIANTS_COUNT, MagicStoneJewels } from "../jewel.js";
+import { MagicStoneJewels } from "../jewel.js";
 import PlayerStatus from "./playerStatus.js";
 import NextBlock from "../block/nextBlock.js";
 import SFX from "../sfx.js";
 import BlockGenerator from "../block/blockGenerator.js";
 import MagicStone from "../block/magicStone.js";
-import CpuPlayer from "./cpuPlayer.js";
 
 export default abstract class Player {
     nextBlock: NextBlock
@@ -14,7 +13,7 @@ export default abstract class Player {
     board: Board
     autoPush: boolean
     maxSpeed = 0.5
-    inRisk = false
+    poisoned = false
 
     // references
     opponent: Player | null = null
@@ -147,9 +146,15 @@ export default abstract class Player {
                 if (this.clearCount >= this.lastArrowCount + 20){
                     this.sfx.playMagicStone()
                     this.lastArrowCount = this.clearCount
-                    //this.board.clearMysterious()
-                    //this.board.clearColor(this.fallingBlock.jewels[2].color)
                     this.nextBlock = new MagicStone()
+                }
+
+                // poison if multiplier if clearing chain was at least 3
+                if (this.multiplier > 11){
+                    setTimeout(() => {
+                        this.sfx.playPoisoned()
+                        this.opponent?.poison()
+                    }, 500)
                 }
             }
         } else if (this.timesInState >= 15) {
@@ -227,22 +232,35 @@ export default abstract class Player {
         }
     }
 
+    protected poison(){
+        this.poisoned = true
+        setTimeout(() => {
+            this.poisoned = false
+        }, 12000)
+    }
+
+    // -------------------------------------
+
     nextFallingBlock(){
         this.fallingBlock = new FallingBlock(this.nextBlock)
         this.nextBlock = this.blockGenerator.getCopy(++this.currentBlockIndex)
     }
 
+    isScared(): boolean {
+        return this.poisoned || this.board.hasJewelsInRow(2)
+    }
+
     drawNextBlock(imgJewels: HTMLImageElement[]) {
         this.nextCtx.clearRect(0, 0, this.nextEl.width, this.nextEl.height)
-        this.nextBlock.draw(imgJewels, this.nextCtx)
+        this.nextBlock.draw(imgJewels, this.nextCtx, this.poisoned)
     }
 
     drawBoard(imgJewels: HTMLImageElement[]) {
         this.ticks++
-        this.board.draw(imgJewels, this.boardCtx, this.ticks)
+        this.board.draw(imgJewels, this.boardCtx, this.ticks, this.poisoned)
 
         if (this.status === PlayerStatus.FALLING_BLOCK)
-            this.fallingBlock.draw(imgJewels, this.boardCtx)
+            this.fallingBlock.draw(imgJewels, this.boardCtx, this.poisoned)
     }
 
     clearBoardCtx(){
@@ -276,6 +294,7 @@ export default abstract class Player {
         this.timesInState = 0
         this.ticks = 0
         this.multiplier = 3
+        this.poisoned = false
     }
 
     pause(){

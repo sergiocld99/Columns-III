@@ -50,6 +50,10 @@ export default class SFX {
         this.stopBgm()
     }
 
+    playPoisoned(){
+        this.playSound("poisoned")
+    }
+
     playIntro(match: Match){
         if (this.fadingInterv) clearInterval(this.fadingInterv)
         

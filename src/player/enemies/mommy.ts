@@ -12,7 +12,7 @@ export default class Mommy extends CpuPlayer {
 
     protected shouldPush(): boolean {
         if (this.blueScore < 10) return false
-        if (this.inRisk) return true
+        if (this.isScared()) return true
         return this.blueScore >= 20
     }
 
