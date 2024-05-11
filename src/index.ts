@@ -14,14 +14,19 @@ let imgJewels: HTMLImageElement[] = []
 function loadImgJewels(stage: number) {
     imgJewels = Array(6)
 
-    for (let i=0; i<imgJewels.length; i++) 
-        imgJewels[i] = document.getElementById(`st${stage < 4 ? 1 : stage}-${i+1}`) as HTMLImageElement
-    
+    for (let j=0; j<imgJewels.length; j++){
+        let img = new Image()
+        img.src = `jewels/st${stage < 4 ? 1 : stage}-${j+1}.png`
+        imgJewels[j] = img
+    }
+
     imgJewels.push(document.getElementById('mysterious') as HTMLImageElement)
     
     // magic stone
     for (let i=0; i<3; i++){
-        imgJewels.push(document.getElementById(`ms-${i+1}`) as HTMLImageElement)
+        let img = new Image()
+        img.src = `jewels/ms-${i+1}.png`
+        imgJewels.push(img)
     }
 }
 
@@ -29,8 +34,12 @@ function loadImgJewels(stage: number) {
 const characterCanvas = document.getElementsByClassName("enemy-box")[0] as HTMLCanvasElement
 const characterCtx = characterCanvas.getContext("2d")!
 const sphinxImgs = Array(3)
-for (let i=0; i<sphinxImgs.length; i++) 
-    sphinxImgs[i] = document.getElementById(`sphinx-${i+1}`) as HTMLImageElement
+
+for (let i=0; i<sphinxImgs.length; i++) {
+    let img = new Image()
+    img.src = `gfx/sphinx-${i+1}.png`
+    sphinxImgs[i] = img
+}
 
 // COMMON SETUP
 const sfx = new SFX(randInt(5)+1)
@@ -64,9 +73,11 @@ setInterval(() => {
 
 setInterval(() => {
     player1.drawNextBlock(imgJewels)
+    player1.clearBoardCtx()
     player1.drawBoard(imgJewels)
 
     player2.drawNextBlock(imgJewels)
+    player2.clearBoardCtx()
     player2.drawBoard(imgJewels)
 }, 20)
 

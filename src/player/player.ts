@@ -239,12 +239,14 @@ export default abstract class Player {
 
     drawBoard(imgJewels: HTMLImageElement[]) {
         this.ticks++
-
-        this.boardCtx.clearRect(0, 0, this.boardEl.width, this.boardEl.height)
         this.board.draw(imgJewels, this.boardCtx, this.ticks)
 
         if (this.status === PlayerStatus.FALLING_BLOCK)
             this.fallingBlock.draw(imgJewels, this.boardCtx)
+    }
+
+    clearBoardCtx(){
+        this.boardCtx.clearRect(0, 0, this.boardEl.width, this.boardEl.height)
     }
 
     updateBlueScore(diff: number) {

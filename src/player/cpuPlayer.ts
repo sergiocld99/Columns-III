@@ -8,7 +8,7 @@ import Player from "./player.js";
 export default abstract class CpuPlayer extends Player {
     auxTicks = 0
     doNotMove = false
-    targetCol = 0
+    targetCol = -1
     timesRotated = 0
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
@@ -18,7 +18,7 @@ export default abstract class CpuPlayer extends Player {
     reset(): void {
         super.reset()
         this.doNotMove = false
-        this.targetCol = 0
+        this.targetCol = -1
         this.speed = 0.10
         this.timesRotated = 0
         this.inRisk = false
@@ -172,6 +172,16 @@ export default abstract class CpuPlayer extends Player {
     protected pushOpponent(): void {
         if (this.blueScore >= 20) this.inRisk = false
         super.pushOpponent()
+    }
+
+    drawBoard(imgJewels: HTMLImageElement[]): void {
+        // show target col
+        if (this.sfx.stage < 4 && this.targetCol >= 0){
+            this.boardCtx.fillStyle = "#0B170F"
+            this.boardCtx.fillRect(50*this.targetCol,0,50,13*50)
+        }
+
+        super.drawBoard(imgJewels)
     }
 
     protected abstract manageMagicStone(topCell: Jewel | null): MagicStoneJewels
