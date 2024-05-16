@@ -61,7 +61,7 @@ export default abstract class CpuPlayer extends Player {
 
         // build column candidates
         let median = this.fallingBlock.getMedianColor()
-        let candidates: number[] = median < 3 ? [0, 1] : [5,4,3]
+        let candidates: number[] = median < 3 ? [0, 1] : median > 3 ? [5,4,3] : [0,1,5,4,3]
 
         // find max height to avoid it
         let currentHeight: number
@@ -133,7 +133,7 @@ export default abstract class CpuPlayer extends Player {
                     this.fallingBlock.rotate(this.sfx)
                 } else if (this.fallingBlock.colorCount === 2 && !this.fallingBlock.areTopJewelsTheSame()){
                     this.fallingBlock.rotate(this.sfx)
-                } else if (!this.isScared() && this.opponent?.isScared()){
+                } else {
                     this.speedUp()
                 }
             }

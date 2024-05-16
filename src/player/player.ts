@@ -201,22 +201,19 @@ export default abstract class Player {
 
     private pushOpponentUsingArrow(){
         if (!this.opponent) return
-        this.opponent.breakFallingBlock()
         this.sfx.playNormalPush()
 
         // add one mysterious jewel in each column
-        let added = 0
-
         for (let c=0; c<this.board.colCount; c++){
-            added += this.opponent.board.poisonColumn(c)
+            this.opponent.board.poisonColumn(c)
         }
 
-        console.log(`Push effectivity: ${(added*100/6).toFixed(0)}%`)
+        // always at the end!
+        this.opponent.breakFallingBlock()
     }
 
     protected pushOpponent() {
         if (!this.opponent || this.blueScore < 10 || this.status != PlayerStatus.FALLING_BLOCK) return
-        this.opponent.breakFallingBlock()
 
         let count = Math.floor(this.blueScore / 10)
         if (count >= 3) this.sfx.playBigPush()
@@ -224,12 +221,19 @@ export default abstract class Player {
 
         // random
         let attemptsLeft = 100
+        let added = 0
 
         while (this.blueScore >= 10 && --attemptsLeft > 0) {
             let randomIndex = Math.floor(Math.random() * this.board.colCount)
-            let added = this.opponent.board.poisonColumn(randomIndex)
-            if (added) this.updateBlueScore(-added * 10)
+            added += this.opponent.board.poisonColumn(randomIndex)
+            if (added >= 2) {
+                this.updateBlueScore(-10)
+                added = 0
+            }
         }
+
+        // always at the end!
+        this.opponent.breakFallingBlock()
     }
 
     protected poison(){
