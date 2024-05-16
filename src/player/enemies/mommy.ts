@@ -1,7 +1,7 @@
-import BlockGenerator from "../../block/blockGenerator.js";
-import { Jewel, MagicStoneJewels } from "../../jewel.js";
-import SFX from "../../sfx.js";
-import CpuPlayer from "../cpuPlayer.js";
+import BlockGenerator from "../../block/blockGenerator";
+import { Jewel, MagicStoneJewels } from "../../jewel";
+import SFX from "../../sfx";
+import CpuPlayer from "../cpuPlayer";
 
 export default class Mommy extends CpuPlayer {
 

@@ -1,7 +1,7 @@
-import BlockGenerator from "../block/blockGenerator.js";
-import { COLOR_VARIANTS_COUNT } from "../jewel.js";
-import SFX from "../sfx.js";
-import Player from "./player.js";
+import BlockGenerator from "../block/blockGenerator";
+import { COLOR_VARIANTS_COUNT } from "../jewel";
+import SFX from "../sfx";
+import Player from "./player";
 
 export default class ManualPlayer extends Player {
     pressingDown = false

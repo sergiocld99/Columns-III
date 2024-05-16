@@ -1,7 +1,7 @@
-import Player from "../player/player.js";
-import PlayerStatus from "../player/playerStatus.js";
-import SFX from "../sfx.js";
-import { MatchStatus } from "./matchStatus.js";
+import Player from "../player/player";
+import PlayerStatus from "../player/playerStatus";
+import SFX from "../sfx";
+import { MatchStatus } from "./matchStatus";
 
 export default class Match {
     status: MatchStatus

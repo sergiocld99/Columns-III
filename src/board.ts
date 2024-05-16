@@ -1,8 +1,8 @@
-import Block from "./block/block.js";
-import FallingBlock from "./block/fallingBlock.js";
-import { ClearPredict } from "./clearPredict.js";
-import { Jewel } from "./jewel.js";
-import JewelOutside from "./jewelOutside.js";
+import Block from "./block/block";
+import FallingBlock from "./block/fallingBlock";
+import { ClearPredict } from "./clearPredict";
+import { Jewel } from "./jewel";
+import JewelOutside from "./jewelOutside";
 
 type Cell = Jewel | null
 type Position = [number, number]

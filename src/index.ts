@@ -1,13 +1,10 @@
-import BlockGenerator from "./block/blockGenerator.js";
-import PlayerStatus from "./player/playerStatus.js";
-import CpuPlayer from "./player/cpuPlayer.js";
-import ManualPlayer from "./player/manualPlayer.js";
-import SFX from "./sfx.js";
-import { randInt } from "./utils.js";
-import Match from "./match/match.js";
-import Sphinx from "./player/enemies/sphinx.js";
-import Mommy from "./player/enemies/mommy.js";
-import { MatchStatus } from "./match/matchStatus.js";
+import BlockGenerator from "./block/blockGenerator";
+import PlayerStatus from "./player/playerStatus";
+import SFX from "./sfx";
+import { randInt } from "./utils";
+import Match from "./match/match";
+import Sphinx from "./player/enemies/sphinx";
+import { MatchStatus } from "./match/matchStatus";
 
 let imgJewels: HTMLImageElement[] = []
 
@@ -55,7 +52,7 @@ const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 loadImgJewels(sfx.stage)
 
 // SETUP FOR PLAYER 1
-let player1 = new Mommy(document, "left", sfx, blockGenerator)
+let player1 = new Sphinx(document, "left", sfx, blockGenerator)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2

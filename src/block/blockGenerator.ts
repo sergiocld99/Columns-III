@@ -1,5 +1,5 @@
-import Block from "./block.js"
-import NextBlock from "./nextBlock.js"
+import Block from "./block"
+import NextBlock from "./nextBlock"
 
 export default class BlockGenerator {
     private colors: number[]

@@ -1,4 +1,4 @@
-import { Jewel } from "./jewel.js";
+import { Jewel } from "./jewel";
 
 export default class JewelOutside extends Jewel {
     column: number

@@ -1,11 +1,11 @@
-import Board from "../board.js";
-import FallingBlock from "../block/fallingBlock.js";
-import { MagicStoneJewels } from "../jewel.js";
-import PlayerStatus from "./playerStatus.js";
-import NextBlock from "../block/nextBlock.js";
-import SFX from "../sfx.js";
-import BlockGenerator from "../block/blockGenerator.js";
-import MagicStone from "../block/magicStone.js";
+import Board from "../board";
+import FallingBlock from "../block/fallingBlock";
+import { MagicStoneJewels } from "../jewel";
+import PlayerStatus from "./playerStatus";
+import NextBlock from "../block/nextBlock";
+import SFX from "../sfx";
+import BlockGenerator from "../block/blockGenerator";
+import MagicStone from "../block/magicStone";
 
 export default abstract class Player {
     nextBlock: NextBlock

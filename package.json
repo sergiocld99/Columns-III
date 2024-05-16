@@ -1,0 +1,20 @@
+{
+  "name": "ts-columns-3",
+  "version": "1.0.0",
+  "description": "Columns III Sega Game made in TypeScript",
+  "main": "bundle.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sergio Calderon",
+  "license": "MIT",
+  "devDependencies": {
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  }
+}

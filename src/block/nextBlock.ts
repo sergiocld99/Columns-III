@@ -1,6 +1,6 @@
-import Block from "./block.js";
-import { Jewel } from "../jewel.js";
-import { randInt } from "../utils.js";
+import Block from "./block";
+import { Jewel } from "../jewel";
+import { randInt } from "../utils";
 
 export default class NextBlock extends Block {
 

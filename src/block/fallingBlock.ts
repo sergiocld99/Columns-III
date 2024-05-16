@@ -1,7 +1,7 @@
-import Block from "./block.js";
-import Board from "../board.js";
-import { Jewel } from "../jewel.js";
-import SFX from "../sfx.js";
+import Block from "./block";
+import Board from "../board";
+import { Jewel } from "../jewel";
+import SFX from "../sfx";
 
 export default class FallingBlock extends Block {
     colorCount: number

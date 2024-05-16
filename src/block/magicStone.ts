@@ -1,6 +1,6 @@
-import { Jewel } from "../jewel.js";
-import Block from "./block.js";
-import NextBlock from "./nextBlock.js";
+import { Jewel } from "../jewel";
+import Block from "./block";
+import NextBlock from "./nextBlock";
 
 export default class MagicStone extends NextBlock {
 

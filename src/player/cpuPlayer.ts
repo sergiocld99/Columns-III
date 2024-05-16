@@ -1,9 +1,9 @@
-import BlockGenerator from "../block/blockGenerator.js";
-import { ClearPredict } from "../clearPredict.js";
-import { COLOR_VARIANTS_COUNT, Jewel, MagicStoneJewels } from "../jewel.js";
-import SFX from "../sfx.js";
-import { randInt } from "../utils.js";
-import Player from "./player.js";
+import BlockGenerator from "../block/blockGenerator";
+import { ClearPredict } from "../clearPredict";
+import { COLOR_VARIANTS_COUNT, Jewel, MagicStoneJewels } from "../jewel";
+import SFX from "../sfx";
+import { randInt } from "../utils";
+import Player from "./player";
 
 export default abstract class CpuPlayer extends Player {
     auxTicks = 0
@@ -60,16 +60,15 @@ export default abstract class CpuPlayer extends Player {
         }
 
         // build column candidates
-        let candidates = new Set<number>
-        for (let i=0; i<4; i++) candidates.add(randInt(this.board.colCount))
-        candidates.delete(2)
+        let median = this.fallingBlock.getMedianColor()
+        let candidates: number[] = median < 3 ? [0, 1] : [5,4,3]
 
         // find max height to avoid it
         let currentHeight: number
         let minHeight = this.board.rowCount   
 
         candidates.forEach(col => {
-            currentHeight = this.board.getPonderedColumnHeight(col)
+            currentHeight = this.board.getColumnHeight(col)
 
             if (currentHeight < minHeight && this.board.matrix[2][col] === null){
                 if (this.fallingBlock.colorCount === 2 && this.board.getTopCellsSameColor(col)){

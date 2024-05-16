@@ -1,5 +1,5 @@
-import Match from "./match/match.js"
-import { MatchStatus } from "./match/matchStatus.js"
+import Match from "./match/match"
+import { MatchStatus } from "./match/matchStatus"
 
 export default class SFX {
     stage: number

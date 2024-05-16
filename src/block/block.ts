@@ -1,5 +1,5 @@
 // Block of 3 jewels
-import { Jewel } from "../jewel.js";
+import { Jewel } from "../jewel";
 
 export default abstract class Block {
     jewels: Jewel[] = []
@@ -19,5 +19,10 @@ export default abstract class Block {
 
     getColors(): number[] {
         return [this.jewels[0].color, this.jewels[1].color, this.jewels[2].color]
+    }
+
+    getMedianColor(): number {
+        let sorted = this.jewels.sort((a,b) => a.color - b.color)
+        return sorted[1].color
     }
 }
