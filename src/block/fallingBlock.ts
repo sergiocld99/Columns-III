@@ -2,6 +2,7 @@ import Block from "./block";
 import Board from "../board";
 import { Jewel } from "../jewel";
 import SFX from "../sfx";
+import NextBlock from "./nextBlock";
 
 export default class FallingBlock extends Block {
     colorCount: number
@@ -16,8 +17,8 @@ export default class FallingBlock extends Block {
         return Math.ceil(this.row + this.jewels.length - 1)
     }
 
-    rotate(sfx: SFX){
-        sfx.playRotate()
+    rotate(sfx: SFX | null = null){
+        if (sfx) sfx.playRotate()
         this.jewels = [this.jewels[2], this.jewels[0], this.jewels[1]]    
     }
 
@@ -59,14 +60,37 @@ export default class FallingBlock extends Block {
         return this.jewels[0].equals(this.jewels[1])
     }
 
+    areBottomJewelsTheSame(): boolean {
+        return this.jewels[2].equals(this.jewels[1])
+    }
+
     isMagicStone(): boolean {
         return this.jewels[0].isMagicStoneType()
     }
 
+    getAllCombinations(): FallingBlock[] {
+        let arr: FallingBlock[] = [this]
+        
+        for (let i=1; i<3; i++){
+            let aux = new NextBlock()
+            aux.jewels = [...this.jewels]
+
+            let b = new FallingBlock(aux)
+            for (let j=0; j<i; j++) b.rotate()
+            arr.push(b)
+        }
+
+        return arr
+    }
+
     getRepeatedColor(): number {
-        let res = this.jewels[0].color
-        if (this.jewels[1].color === res) return res
-        else return this.jewels[2].color
+        return this.getRepeatedJewel().color
+    }
+
+    getRepeatedJewel(): Jewel {
+        let res = this.jewels[0]
+        if (this.jewels[1].color === res.color) return res
+        else return this.jewels[2]
     }
 
     private getUniqueColorCount(): number {

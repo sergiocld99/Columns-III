@@ -3,10 +3,13 @@ import PlayerStatus from "./player/playerStatus";
 import SFX from "./sfx";
 import { randInt } from "./utils";
 import Match from "./match/match";
-import Sphinx from "./player/enemies/sphinx";
 import { MatchStatus } from "./match/matchStatus";
 import ManualPlayer from "./player/manualPlayer";
 import Mommy from "./player/enemies/mommy";
+import Sphinx from "./player/enemies/sphinx";
+import Witch from "./player/enemies/witch";
+import Scorpion from "./player/enemies/scorpion";
+import Spider from "./player/enemies/spider";
 
 let imgJewels: HTMLImageElement[] = []
 
@@ -54,11 +57,11 @@ const blockGenerator = new BlockGenerator([0, 3, 4, 5, 1])
 loadImgJewels(sfx.stage)
 
 // SETUP FOR PLAYER 1
-let player1 = new Mommy(document, "left", sfx, blockGenerator)
+let player1 = new Sphinx(document, "left", sfx, blockGenerator, 0)
 player1.drawNextBlock(imgJewels)
 
 // SETUP FOR PLAYER 2
-let player2 = new Sphinx(document, "right", sfx, blockGenerator)
+let player2 = new Sphinx(document, "right", sfx, blockGenerator, 1)
 player2.drawNextBlock(imgJewels)
 
 // SET OPPONENTS
@@ -102,6 +105,10 @@ setInterval(() => {
     }
 
     characterCtx.drawImage(resource, 0, 0, 231, 231, 0, 0, 150, 150)
+
+    // time
+    const timeEl = document.getElementById("match-time") as HTMLParagraphElement
+    timeEl.innerHTML = match.getTime()
 }, 250)
 
 document.addEventListener("keydown", e => {

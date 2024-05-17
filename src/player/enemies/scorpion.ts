@@ -3,22 +3,20 @@ import { Jewel, MagicStoneJewels } from "../../jewel";
 import SFX from "../../sfx";
 import CpuPlayer from "../cpuPlayer";
 
-export default class Mommy extends CpuPlayer {
+export default class Scorpion extends CpuPlayer {
 
     constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator, side: number){
         super(document, preffix, sfx, blockGenerator, side)
-        this.maxSpeed -= 0.1
+        this.maxSpeed -= 0.2
     }
 
     protected shouldPush(): boolean {
         if (this.blueScore < 10) return false
         if (this.isScared()) return true
-        return this.blueScore >= 20
+        return this.blueScore >= 30
     }
 
-    protected manageMagicStone(topCell: Jewel | null): MagicStoneJewels {
-        if (this.board.hasJewelsInRow(6,0)) return MagicStoneJewels.PUSH_DOWN
-        if (topCell && this.board.stats.isPopularColor(topCell.color)) return MagicStoneJewels.CLEAR
+    protected manageMagicStone(): MagicStoneJewels {
         return MagicStoneJewels.PUSH_UP
     }
 
@@ -27,6 +25,6 @@ export default class Mommy extends CpuPlayer {
     }
 
     protected getName(): string {
-        return "Mommy"
+        return "Scorpion"
     }
 }

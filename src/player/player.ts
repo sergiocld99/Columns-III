@@ -251,7 +251,7 @@ export default abstract class Player {
     }
 
     isScared(): boolean {
-        return this.poisoned || this.board.hasJewelsInRow(2)
+        return this.poisoned || this.board.hasJewelsInRow(2,1)
     }
 
     drawNextBlock(imgJewels: HTMLImageElement[]) {

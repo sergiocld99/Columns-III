@@ -6,8 +6,8 @@ import PlayerStatus from "../playerStatus";
 
 export default class Sphinx extends CpuPlayer {
 
-    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
-        super(document, preffix, sfx, blockGenerator)
+    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator, side: number){
+        super(document, preffix, sfx, blockGenerator, side)
     }
 
     protected shouldPush(): boolean {
@@ -23,15 +23,9 @@ export default class Sphinx extends CpuPlayer {
     }
 
     protected manageMagicStone(topCell: Jewel | null): MagicStoneJewels {
-        if (this.isScared()) return MagicStoneJewels.CLEAR
-
-        if (this.board.getColumnHeight(this.fallingBlock.col) <= 4 || this.opponent?.isScared()){
-            return MagicStoneJewels.PUSH_UP
-        } else if (topCell?.mysterious){
-            return MagicStoneJewels.PUSH_DOWN
-        } else {
-            return MagicStoneJewels.CLEAR
-        }
+        if (this.board.hasJewelsInRow(4,0)) return MagicStoneJewels.PUSH_DOWN
+        if (topCell && this.board.stats.isPopularColor(topCell.color)) return MagicStoneJewels.CLEAR
+        return MagicStoneJewels.PUSH_UP
     }
 
     protected getMinRowForSpeeding(): number {

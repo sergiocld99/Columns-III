@@ -32,10 +32,6 @@
             justify-content: center;
         }
 
-        .enemy-box {
-            margin-top: 100px;
-        }
-
         .board {
             border: 3px solid white;
             margin-bottom: 15px;
@@ -70,6 +66,18 @@
             text-align: right;
         }
 
+        .time-box {
+            min-width: 150px;
+            min-height: 50px;
+            color: aqua;
+            font-size: 40px;
+            text-align: center;
+        }
+
+        .enemy-box {
+            margin-top: 50px;
+        }
+
         img {
             display: none;
         }
@@ -99,6 +107,7 @@
             </div>
         </div>
 
+        <p class="board time-box" id="match-time">0:00</p>
         <canvas class="enemy-box board" width="150px" height="150px"></canvas>
             
         </div>

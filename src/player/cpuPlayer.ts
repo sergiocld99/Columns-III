@@ -10,9 +10,11 @@ export default abstract class CpuPlayer extends Player {
     doNotMove = false
     targetCol = -1
     timesRotated = 0
+    side: number
 
-    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator){
+    constructor(document: Document, preffix: string, sfx: SFX, blockGenerator: BlockGenerator, side: number){
         super(document, preffix, sfx, blockGenerator, true)
+        this.side = side
     }
 
     reset(): void {
@@ -53,7 +55,6 @@ export default abstract class CpuPlayer extends Player {
                 let candidate = this.board.findTargetColumn(this.fallingBlock.jewels[i])
                 if (candidate) {
                     this.targetCol = candidate
-                    console.log(this.getName(), " - Best target: column", candidate)
                     return
                 }
             }
@@ -61,9 +62,26 @@ export default abstract class CpuPlayer extends Player {
 
         // build column candidates
         let median = this.fallingBlock.getMedianColor()
-        let candidates: number[] = median < 3 ? [0, 1] : median > 3 ? [5,4,3] : [0,1,5,4,3]
+        //let 
+        let candidates = this.board.stats.getMaxColumnOccurrences(median)
+
+        // clear prediction
+        let combinations = this.fallingBlock.getAllCombinations()
+
+        for (let i=0; i<candidates.length; i++){
+            for (let j=0; j<combinations.length; j++){
+                let predict = this.board.predictClear(combinations[j], candidates[i])
+                // do not target col 5 if col 4 height is maximum
+                if (predict && !(i === 5 && this.board.matrix[4][0])) {
+                    this.targetCol = candidates[i]
+                    if (this.side) console.log("Can clear in column", candidates[i])
+                    return
+                }
+            }
+        }
 
         // find max height to avoid it
+        candidates = [0,1,5,4,3,2]
         let currentHeight: number
         let minHeight = this.board.rowCount   
 
@@ -72,7 +90,7 @@ export default abstract class CpuPlayer extends Player {
 
             if (currentHeight < minHeight && this.board.matrix[2][col] === null){
                 if (this.fallingBlock.colorCount === 2 && this.board.getTopCellsSameColor(col)){
-                     console.log("Not choosing column", col)
+                     //console.log("Not choosing column", col)
                 } else {
                     minHeight = currentHeight
                     this.targetCol = col
@@ -91,7 +109,7 @@ export default abstract class CpuPlayer extends Player {
         super.stepFalling()
         this.auxTicks++
 
-        if (this.auxTicks >= 5 && this.fallingBlock.row > -2 && !this.doNotMove){
+        if (this.auxTicks >= 5 && this.fallingBlock.row > -2.5 && !this.doNotMove){
             this.auxTicks = 0
 
             let currentCol = this.fallingBlock.col
@@ -102,14 +120,15 @@ export default abstract class CpuPlayer extends Player {
                     this.timesRotated = 0
                 }
             } else if (currentCol < this.targetCol) {
-                if (currentCol === 3 && this.board.matrix[2][4]){
-                    console.log("Column 4 avoided for", this.getName())
-                } else {
+                // if (currentCol === 3 && this.board.matrix[2][4]){
+                //     console.log("Column 4 avoided for", this.getName())
+                // } else {
                     this.fallingBlock.moveRight(this.board)
                     this.timesRotated = 0
                     
-                }
-
+                // }
+            } else {
+                this.doNotMove = true
             }
         }
 
@@ -122,8 +141,15 @@ export default abstract class CpuPlayer extends Player {
                 let target = this.manageMagicStone(topCell)
                 if (this.fallingBlock.getBottomJewel().color != target) this.fallingBlock.rotate(this.sfx)
             } else if (this.board.canClear(this.fallingBlock)){
-                this.doNotMove = true
-                this.speedUp()
+                if (this.fallingBlock.colorCount === 2 && topCell?.equals(this.fallingBlock.getRepeatedJewel())){
+                    if (this.fallingBlock.areBottomJewelsTheSame()){
+                        this.doNotMove = true
+                        this.speedUp()
+                    } else this.fallingBlock.rotate()
+                } else {
+                    this.doNotMove = true
+                    this.speedUp()
+                }
             } else {
                 this.doNotMove = false
                 if (this.board.isColumnEmpty(this.fallingBlock.col)) this.speedUp()

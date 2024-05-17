@@ -3,6 +3,7 @@ import FallingBlock from "./block/fallingBlock";
 import { ClearPredict } from "./clearPredict";
 import { Jewel } from "./jewel";
 import JewelOutside from "./jewelOutside";
+import BoardStats from "./stats/BoardStats";
 
 type Cell = Jewel | null
 type Position = [number, number]
@@ -14,12 +15,14 @@ export default class Board {
     rowCount: number
     colCount: number
     jewelsOutside: JewelOutside[] = []
+    stats: BoardStats
 
     constructor(rows: number, cols: number){
         this.rowCount = rows
         this.colCount = cols
-
         this.matrix = Array(rows)
+        this.stats = new BoardStats(cols)
+
         for (let i=0; i<rows; i++){
             this.matrix[i] = Array(cols).fill(null)
         }
@@ -55,13 +58,18 @@ export default class Board {
             }
         }
 
+        this.stats.addOccurrences(block)
         return this.jewelsOutside.length < 3
     }
 
     // ---- AFTER BLOCK PLACED ----------------------------
 
     clearPending() : boolean {
-        this.toClear.forEach(pos => this.matrix[pos[0]][pos[1]] = null)
+        this.toClear.forEach(pos => {
+            let color = this.matrix[pos[0]][pos[1]]?.color
+            if (color) this.stats.removeOcurrence(color, pos[1])
+            this.matrix[pos[0]][pos[1]] = null
+        })
         this.toClear = []
         this.currentClearCount = 0
         return this.applyGravityEverywhere()
@@ -278,8 +286,8 @@ export default class Board {
 
     // ----------------------------------------------------
 
-    hasJewelsInRow(r: number): boolean {
-        for (let c=1; c<this.colCount-1; c++){
+    hasJewelsInRow(r: number, offset: number): boolean {
+        for (let c=offset; c<this.colCount-offset; c++){
             if (this.matrix[r][c]) return true
         }
 
@@ -305,6 +313,7 @@ export default class Board {
 
         this.toClear = []
         this.jewelsOutside = []
+        this.stats.reset()
         this.currentClearCount = 0
     }
 
@@ -403,9 +412,17 @@ export default class Board {
         return null
     }
 
+    predictClear(fallingBlock: FallingBlock, col: number): ClearPredict | null {
+        const originalCol = fallingBlock.col
+        fallingBlock.col = col
+        const res = this.canClear(fallingBlock)
+        fallingBlock.col = originalCol
+        return res
+    }
+
     canClear(fallingBlock: FallingBlock): ClearPredict | null {
         if (fallingBlock.col === 2){
-            if (this.matrix[2][2]){
+            if (this.matrix[1][2]){
                 //console.log("Avoiding immediate lose at column 2...")
                 return null
             }
